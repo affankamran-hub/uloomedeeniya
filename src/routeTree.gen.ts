@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AssignmentsRouteImport } from './routes/assignments'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as GradesRouteImport } from './routes/grades'
 import { Route as LecturesRouteImport } from './routes/lectures'
@@ -25,6 +26,11 @@ const IndexRoute = IndexRouteImport.update({
 const AssignmentsRoute = AssignmentsRouteImport.update({
   id: '/assignments',
   path: '/assignments',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EventsRoute = EventsRouteImport.update({
@@ -56,6 +62,7 @@ const TestsRoute = TestsRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/assignments': typeof AssignmentsRoute
+  '/auth': typeof AuthRoute
   '/events': typeof EventsRoute
   '/grades': typeof GradesRoute
   '/lectures': typeof LecturesRoute
@@ -65,6 +72,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/assignments': typeof AssignmentsRoute
+  '/auth': typeof AuthRoute
   '/events': typeof EventsRoute
   '/grades': typeof GradesRoute
   '/lectures': typeof LecturesRoute
@@ -75,6 +83,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/assignments': typeof AssignmentsRoute
+  '/auth': typeof AuthRoute
   '/events': typeof EventsRoute
   '/grades': typeof GradesRoute
   '/lectures': typeof LecturesRoute
@@ -86,6 +95,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/assignments'
+    | '/auth'
     | '/events'
     | '/grades'
     | '/lectures'
@@ -95,6 +105,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/assignments'
+    | '/auth'
     | '/events'
     | '/grades'
     | '/lectures'
@@ -104,6 +115,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/assignments'
+    | '/auth'
     | '/events'
     | '/grades'
     | '/lectures'
@@ -114,6 +126,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AssignmentsRoute: typeof AssignmentsRoute
+  AuthRoute: typeof AuthRoute
   EventsRoute: typeof EventsRoute
   GradesRoute: typeof GradesRoute
   LecturesRoute: typeof LecturesRoute
@@ -135,6 +148,13 @@ declare module '@tanstack/react-router' {
       path: '/assignments'
       fullPath: '/assignments'
       preLoaderRoute: typeof AssignmentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/events': {
@@ -178,6 +198,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AssignmentsRoute: AssignmentsRoute,
+  AuthRoute: AuthRoute,
   EventsRoute: EventsRoute,
   GradesRoute: GradesRoute,
   LecturesRoute: LecturesRoute,
