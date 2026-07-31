@@ -56,7 +56,10 @@ function MembersTab() {
 
   const setApproved = async (id: string, approved: boolean) => {
     const { error } = await supabase.from("profiles").update({ approved }).eq("id", id);
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success(approved ? "Member approved" : "Approval revoked");
     qc.invalidateQueries({ queryKey: ["profiles"] });
   };
@@ -124,7 +127,10 @@ function ContentTab() {
       url: form.url || null,
       event_date: form.event_date ? new Date(form.event_date).toISOString() : null,
     });
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success("Published");
     setForm({ ...form, title: "", title_ur: "", description: "", url: "", event_date: "" });
     qc.invalidateQueries({ queryKey: ["content"] });
@@ -132,7 +138,10 @@ function ContentTab() {
 
   const remove = async (item: ContentRow) => {
     const { error } = await supabase.from("content").delete().eq("id", item.id);
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success("Deleted");
     qc.invalidateQueries({ queryKey: ["content"] });
   };
