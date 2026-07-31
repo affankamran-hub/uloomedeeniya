@@ -72,18 +72,18 @@ export function SiteLayout({ children }: { children: ReactNode }) {
                     <Link to="/admin">Admin</Link>
                   </Button>
                 )}
-                <Button size="sm" variant="outline" onClick={() => signOut()}>
+                <Button size="sm" variant="onDark" onClick={() => signOut()}>
                   Sign out
                 </Button>
               </>
             ) : (
-              <Button asChild size="sm" variant="secondary">
+              <Button asChild size="sm" variant="gold">
                 <Link to="/auth">Login / Register</Link>
               </Button>
             )}
             <Sheet>
               <SheetTrigger asChild className="lg:hidden">
-                <Button size="icon" variant="outline" aria-label="Open menu">
+                <Button size="icon" variant="onDark" aria-label="Open menu">
                   <Menu className="size-4" />
                 </Button>
               </SheetTrigger>

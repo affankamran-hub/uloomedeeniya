@@ -48,10 +48,10 @@ function Home() {
               دینی تعلیم کا منظم نصاب — پانچ مضامین، پانچ درجات، مسجدِ توحید رفاہ عام کے قریب۔
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
-              <Button asChild size="lg" variant="secondary">
+              <Button asChild size="lg" variant="gold">
                 <Link to="/grades">Explore Grades / درجات</Link>
               </Button>
-              <Button asChild size="lg" variant="outline">
+              <Button asChild size="lg" variant="onDark">
                 <Link to="/auth">Register / رجسٹریشن</Link>
               </Button>
             </div>
