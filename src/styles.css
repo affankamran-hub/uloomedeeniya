@@ -1,6 +1,9 @@
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
+@import "@fontsource-variable/inter";
+@import "@fontsource/amiri";
+@import "@fontsource-variable/noto-nastaliq-urdu";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -19,6 +22,11 @@
  */
 
 @theme inline {
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Amiri", serif;
+  --font-urdu: "Noto Nastaliq Urdu Variable", "Amiri", serif;
+  --color-gold: var(--gold);
+  --color-gold-foreground: var(--gold-foreground);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
