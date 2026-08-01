@@ -102,8 +102,10 @@ function Home() {
                 <CardTitle className="mt-2 text-lg">{s.en}</CardTitle>
                 <p className="urdu text-lg text-primary">{s.ur}</p>
               </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">{s.meaning}</p>
+              <CardContent className="space-y-2">
+                <p className="text-sm font-medium text-foreground">{s.meaning}</p>
+                <p className="text-sm text-muted-foreground">{s.detail}</p>
+                <p className="urdu text-sm leading-loose text-muted-foreground">{s.detailUr}</p>
               </CardContent>
             </Card>
           ))}
