@@ -38,7 +38,11 @@ function GradePanel({ grade }: { grade: number }) {
               <CardTitle className="text-base">{s.en}</CardTitle>
               <p className="urdu text-lg text-primary">{s.ur}</p>
             </CardHeader>
-            <CardContent className="text-sm text-muted-foreground">{s.meaning}</CardContent>
+            <CardContent className="space-y-2 text-sm">
+              <p className="font-medium text-foreground">{s.meaning}</p>
+              <p className="text-muted-foreground">{s.detail}</p>
+              <p className="urdu leading-loose text-muted-foreground">{s.detailUr}</p>
+            </CardContent>
           </Card>
         ))}
       </div>
