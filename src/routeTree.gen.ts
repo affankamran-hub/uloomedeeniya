@@ -16,6 +16,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as GradesRouteImport } from './routes/grades'
 import { Route as LecturesRouteImport } from './routes/lectures'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as TestsRouteImport } from './routes/tests'
 
@@ -54,6 +55,11 @@ const LecturesRoute = LecturesRouteImport.update({
   path: '/lectures',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResourcesRoute = ResourcesRouteImport.update({
   id: '/resources',
   path: '/resources',
@@ -73,6 +79,7 @@ export interface FileRoutesByFullPath {
   '/events': typeof EventsRoute
   '/grades': typeof GradesRoute
   '/lectures': typeof LecturesRoute
+  '/profile': typeof ProfileRoute
   '/resources': typeof ResourcesRoute
   '/tests': typeof TestsRoute
 }
@@ -84,6 +91,7 @@ export interface FileRoutesByTo {
   '/events': typeof EventsRoute
   '/grades': typeof GradesRoute
   '/lectures': typeof LecturesRoute
+  '/profile': typeof ProfileRoute
   '/resources': typeof ResourcesRoute
   '/tests': typeof TestsRoute
 }
@@ -96,6 +104,7 @@ export interface FileRoutesById {
   '/events': typeof EventsRoute
   '/grades': typeof GradesRoute
   '/lectures': typeof LecturesRoute
+  '/profile': typeof ProfileRoute
   '/resources': typeof ResourcesRoute
   '/tests': typeof TestsRoute
 }
@@ -109,6 +118,7 @@ export interface FileRouteTypes {
     | '/events'
     | '/grades'
     | '/lectures'
+    | '/profile'
     | '/resources'
     | '/tests'
   fileRoutesByTo: FileRoutesByTo
@@ -120,6 +130,7 @@ export interface FileRouteTypes {
     | '/events'
     | '/grades'
     | '/lectures'
+    | '/profile'
     | '/resources'
     | '/tests'
   id:
@@ -131,6 +142,7 @@ export interface FileRouteTypes {
     | '/events'
     | '/grades'
     | '/lectures'
+    | '/profile'
     | '/resources'
     | '/tests'
   fileRoutesById: FileRoutesById
@@ -143,6 +155,7 @@ export interface RootRouteChildren {
   EventsRoute: typeof EventsRoute
   GradesRoute: typeof GradesRoute
   LecturesRoute: typeof LecturesRoute
+  ProfileRoute: typeof ProfileRoute
   ResourcesRoute: typeof ResourcesRoute
   TestsRoute: typeof TestsRoute
 }
@@ -198,6 +211,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LecturesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/resources': {
       id: '/resources'
       path: '/resources'
@@ -223,19 +243,10 @@ const rootRouteChildren: RootRouteChildren = {
   EventsRoute: EventsRoute,
   GradesRoute: GradesRoute,
   LecturesRoute: LecturesRoute,
+  ProfileRoute: ProfileRoute,
   ResourcesRoute: ResourcesRoute,
   TestsRoute: TestsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

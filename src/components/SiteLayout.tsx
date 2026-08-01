@@ -67,6 +67,9 @@ export function SiteLayout({ children }: { children: ReactNode }) {
           <div className="ms-auto flex items-center gap-2 lg:ms-0">
             {user ? (
               <>
+                <Button asChild variant="onDark" size="sm">
+                  <Link to="/profile">Profile</Link>
+                </Button>
                 {isAdmin && (
                   <Button asChild variant="secondary" size="sm">
                     <Link to="/admin">Admin</Link>
