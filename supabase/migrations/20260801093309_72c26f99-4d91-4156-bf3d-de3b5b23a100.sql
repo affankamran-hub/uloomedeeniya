@@ -1,0 +1,2 @@
+insert into public.user_roles (user_id, role) values ('221c8738-f69e-424b-af6f-86a3307bf049','admin') on conflict (user_id, role) do nothing;
+update public.profiles set approved = true where id = '221c8738-f69e-424b-af6f-86a3307bf049';
