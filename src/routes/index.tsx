@@ -67,6 +67,42 @@ function Home() {
         </div>
       </section>
 
+      <section className="hero-surface border-y border-primary-foreground/10 py-12 text-primary-foreground">
+        <div className="mx-auto max-w-6xl px-4">
+          <div className="flex items-center gap-2 text-gold">
+            <Clock className="size-5" />
+            <h2 className="text-xl md:text-2xl">
+              Next Class / اگلا درس
+            </h2>
+          </div>
+          <p className="mt-2 max-w-3xl text-primary-foreground/85">
+            Countdown to the next session of Uloom e Deeniya:
+          </p>
+          <p className="urdu mt-1 max-w-3xl text-primary-foreground/85">
+            علوم دینیہ کے اگلے سیشن کی باقی مدت:
+          </p>
+          <div className="mt-6">
+            <CountdownTimer targetDate={new Date("2026-09-06T03:00:00.000Z")} />
+          </div>
+          <p className="mt-5 text-sm text-primary-foreground/80">
+            Sunday, 6 September 2026 at 8:00 AM Karachi time.
+          </p>
+          <p className="urdu mt-1 text-sm text-gold">
+            اتوار، ۶ ستمبر ۲۰۲۶، صبح ۸:۰۰ بجے، کراچی کے وقت کے مطابق۔
+          </p>
+
+          <div className="mt-8 rounded-xl border border-gold/30 bg-primary-foreground/5 p-5">
+            <h3 className="text-lg text-gold">Unofficial Reinforcement Class / غیر سرکاری تقویتی کلاس</h3>
+            <p className="mt-2 text-primary-foreground/90">
+              11 August 2026, Saturday — after Zuhr prayer at Masjid e Tauheed, Rafah e Aam.
+            </p>
+            <p className="urdu mt-2 text-primary-foreground/90">
+              ۱۱ اگست ۲۰۲۶، ہفتہ — نمازِ ظہر کے بعد، مسجدِ توحید، رفاہِ عام۔
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section className="mx-auto max-w-6xl px-4 py-14">
         <Card className="card-soft border-gold/40 bg-secondary/50">
           <CardHeader>
