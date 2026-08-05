@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { BookOpen, GraduationCap, HandCoins, MapPin } from "lucide-react";
+import { BookOpen, GraduationCap, HandCoins, MapPin, Clock } from "lucide-react";
 import logo from "@/assets/logo.jpeg.asset.json";
 import { SiteLayout } from "@/components/SiteLayout";
+import { CountdownTimer } from "@/components/CountdownTimer";
 import { SITE, SUBJECTS, GRADES } from "@/lib/site";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
