@@ -455,7 +455,9 @@ function AdminPage() {
             <TabsTrigger value="members">Members</TabsTrigger>
             <TabsTrigger value="content">Content</TabsTrigger>
           </TabsList>
-          <TabsContent value="members" className="mt-6"><MembersTab /></TabsContent>
+          <TabsContent value="members" className="mt-6">
+            <MembersTab currentUserId={user.id} />
+          </TabsContent>
           <TabsContent value="content" className="mt-6"><ContentTab /></TabsContent>
         </Tabs>
       </div>
