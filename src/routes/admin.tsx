@@ -233,6 +233,7 @@ function MembersTab({ currentUserId }: { currentUserId: string }) {
 function ContentTab() {
   const qc = useQueryClient();
   const { data } = useContent();
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState({
     category: "resource",
     grade: "1",
@@ -244,9 +245,38 @@ function ContentTab() {
     event_date: "",
   });
 
+  const reset = () => {
+    setEditingId(null);
+    setForm({
+      category: "resource",
+      grade: "1",
+      subject: "tafheem",
+      title: "",
+      title_ur: "",
+      description: "",
+      url: "",
+      event_date: "",
+    });
+  };
+
+  const startEdit = (item: ContentRow) => {
+    setEditingId(item.id);
+    setForm({
+      category: item.category,
+      grade: item.grade ? String(item.grade) : "1",
+      subject: item.subject ?? "tafheem",
+      title: item.title,
+      title_ur: item.title_ur ?? "",
+      description: item.description ?? "",
+      url: item.url ?? "",
+      event_date: item.event_date ? item.event_date.slice(0, 16) : "",
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { error } = await supabase.from("content").insert({
+    const payload = {
       category: form.category,
       grade: form.category === "event" ? null : Number(form.grade),
       subject: form.category === "event" ? null : form.subject,
@@ -255,30 +285,37 @@ function ContentTab() {
       description: form.description || null,
       url: form.url || null,
       event_date: form.event_date ? new Date(form.event_date).toISOString() : null,
-    });
+    };
+    const { error } = editingId
+      ? await supabase.from("content").update(payload).eq("id", editingId)
+      : await supabase.from("content").insert(payload);
     if (error) {
       toast.error(error.message);
       return;
     }
-    toast.success("Published");
-    setForm({ ...form, title: "", title_ur: "", description: "", url: "", event_date: "" });
+    toast.success(editingId ? "Updated" : "Published");
+    reset();
     qc.invalidateQueries({ queryKey: ["content"] });
   };
 
   const remove = async (item: ContentRow) => {
+    if (!window.confirm(`Delete "${item.title}"?`)) return;
     const { error } = await supabase.from("content").delete().eq("id", item.id);
     if (error) {
       toast.error(error.message);
       return;
     }
     toast.success("Deleted");
+    if (editingId === item.id) reset();
     qc.invalidateQueries({ queryKey: ["content"] });
   };
 
   return (
     <div className="grid gap-8 lg:grid-cols-[380px_1fr]">
       <Card className="card-soft h-fit">
-        <CardHeader><CardTitle>Add item</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle>{editingId ? "Edit item" : "Add item"}</CardTitle>
+        </CardHeader>
         <CardContent>
           <form onSubmit={submit} className="space-y-4">
             <div className="space-y-2">
@@ -340,7 +377,14 @@ function ContentTab() {
                 <Input type="datetime-local" value={form.event_date} onChange={(e) => setForm({ ...form, event_date: e.target.value })} />
               </div>
             )}
-            <Button type="submit" className="w-full">Publish</Button>
+            <Button type="submit" className="w-full">
+              {editingId ? "Save changes" : "Publish"}
+            </Button>
+            {editingId && (
+              <Button type="button" variant="outline" className="w-full" onClick={reset}>
+                <X className="me-1 size-4" /> Cancel edit
+              </Button>
+            )}
           </form>
         </CardContent>
       </Card>
@@ -355,9 +399,14 @@ function ContentTab() {
                 <p className="font-medium">{item.title}</p>
                 {item.title_ur && <p className="urdu text-sm text-muted-foreground">{item.title_ur}</p>}
               </div>
-              <Button size="icon" variant="outline" className="ms-auto" onClick={() => remove(item)} aria-label="Delete">
-                <Trash2 className="size-4" />
-              </Button>
+              <div className="ms-auto flex gap-2">
+                <Button size="icon" variant="outline" onClick={() => startEdit(item)} aria-label="Edit">
+                  <Pencil className="size-4" />
+                </Button>
+                <Button size="icon" variant="outline" onClick={() => remove(item)} aria-label="Delete">
+                  <Trash2 className="size-4" />
+                </Button>
+              </div>
             </CardContent>
           </Card>
         ))}
