@@ -80,10 +80,21 @@ function AuthPage() {
   };
 
   const google = async () => {
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
-    if (result.error) toast.error("Google sign-in failed");
+    setBusy(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+        extraParams: { prompt: "select_account" },
+      });
+      if (result.error) {
+        toast.error("Google sign-in failed. Please try again.");
+        return;
+      }
+      if (result.redirected) return;
+      toast.success("Signed in with Google / خوش آمدید");
+    } finally {
+      setBusy(false);
+    }
   };
 
   if (!loading && user) {
@@ -182,9 +193,14 @@ function AuthPage() {
               </TabsContent>
             </Tabs>
 
-            <div className="mt-6">
-              <Button variant="outline" className="w-full" onClick={google}>
-                Continue with Google
+            <div className="mt-6 space-y-3">
+              <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                <span className="h-px flex-1 bg-border" />
+                or / یا
+                <span className="h-px flex-1 bg-border" />
+              </div>
+              <Button variant="outline" className="w-full" onClick={google} disabled={busy}>
+                Continue with Google / گوگل سے داخلہ
               </Button>
             </div>
           </CardContent>
