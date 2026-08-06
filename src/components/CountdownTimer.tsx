@@ -22,9 +22,10 @@ function getTimeLeft(target: Date): TimeLeft {
 }
 
 export function CountdownTimer({ targetDate }: { targetDate: Date }) {
-  const [timeLeft, setTimeLeft] = useState<TimeLeft>(() => getTimeLeft(targetDate));
+  const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);
 
   useEffect(() => {
+    setTimeLeft(getTimeLeft(targetDate));
     const timer = setInterval(() => {
       setTimeLeft(getTimeLeft(targetDate));
     }, 1000);
@@ -46,7 +47,7 @@ export function CountdownTimer({ targetDate }: { targetDate: Date }) {
           className="rounded-xl border border-gold/40 bg-primary/10 p-4 text-center backdrop-blur-sm"
         >
           <div className="font-display text-3xl font-semibold text-gold md:text-4xl">
-            {String(timeLeft[unit.key]).padStart(2, "0")}
+            {timeLeft ? String(timeLeft[unit.key]).padStart(2, "0") : "--"}
           </div>
           <div className="mt-1 text-xs text-primary-foreground/80">{unit.labelEn}</div>
           <div className="urdu text-xs text-gold">{unit.labelUr}</div>

@@ -15,8 +15,11 @@ import { Route as AssignmentsRouteImport } from './routes/assignments'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as GradesRouteImport } from './routes/grades'
+import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as LecturesRouteImport } from './routes/lectures'
+import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as QuizRouteImport } from './routes/quiz'
 import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as TestsRouteImport } from './routes/tests'
 
@@ -50,14 +53,29 @@ const GradesRoute = GradesRouteImport.update({
   path: '/grades',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LeaderboardRoute = LeaderboardRouteImport.update({
+  id: '/leaderboard',
+  path: '/leaderboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LecturesRoute = LecturesRouteImport.update({
   id: '/lectures',
   path: '/lectures',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MessagesRoute = MessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QuizRoute = QuizRouteImport.update({
+  id: '/quiz',
+  path: '/quiz',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResourcesRoute = ResourcesRouteImport.update({
@@ -78,8 +96,11 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/events': typeof EventsRoute
   '/grades': typeof GradesRoute
+  '/leaderboard': typeof LeaderboardRoute
   '/lectures': typeof LecturesRoute
+  '/messages': typeof MessagesRoute
   '/profile': typeof ProfileRoute
+  '/quiz': typeof QuizRoute
   '/resources': typeof ResourcesRoute
   '/tests': typeof TestsRoute
 }
@@ -90,8 +111,11 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/events': typeof EventsRoute
   '/grades': typeof GradesRoute
+  '/leaderboard': typeof LeaderboardRoute
   '/lectures': typeof LecturesRoute
+  '/messages': typeof MessagesRoute
   '/profile': typeof ProfileRoute
+  '/quiz': typeof QuizRoute
   '/resources': typeof ResourcesRoute
   '/tests': typeof TestsRoute
 }
@@ -103,8 +127,11 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/events': typeof EventsRoute
   '/grades': typeof GradesRoute
+  '/leaderboard': typeof LeaderboardRoute
   '/lectures': typeof LecturesRoute
+  '/messages': typeof MessagesRoute
   '/profile': typeof ProfileRoute
+  '/quiz': typeof QuizRoute
   '/resources': typeof ResourcesRoute
   '/tests': typeof TestsRoute
 }
@@ -117,8 +144,11 @@ export interface FileRouteTypes {
     | '/auth'
     | '/events'
     | '/grades'
+    | '/leaderboard'
     | '/lectures'
+    | '/messages'
     | '/profile'
+    | '/quiz'
     | '/resources'
     | '/tests'
   fileRoutesByTo: FileRoutesByTo
@@ -129,8 +159,11 @@ export interface FileRouteTypes {
     | '/auth'
     | '/events'
     | '/grades'
+    | '/leaderboard'
     | '/lectures'
+    | '/messages'
     | '/profile'
+    | '/quiz'
     | '/resources'
     | '/tests'
   id:
@@ -141,8 +174,11 @@ export interface FileRouteTypes {
     | '/auth'
     | '/events'
     | '/grades'
+    | '/leaderboard'
     | '/lectures'
+    | '/messages'
     | '/profile'
+    | '/quiz'
     | '/resources'
     | '/tests'
   fileRoutesById: FileRoutesById
@@ -154,8 +190,11 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   EventsRoute: typeof EventsRoute
   GradesRoute: typeof GradesRoute
+  LeaderboardRoute: typeof LeaderboardRoute
   LecturesRoute: typeof LecturesRoute
+  MessagesRoute: typeof MessagesRoute
   ProfileRoute: typeof ProfileRoute
+  QuizRoute: typeof QuizRoute
   ResourcesRoute: typeof ResourcesRoute
   TestsRoute: typeof TestsRoute
 }
@@ -204,6 +243,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GradesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/leaderboard': {
+      id: '/leaderboard'
+      path: '/leaderboard'
+      fullPath: '/leaderboard'
+      preLoaderRoute: typeof LeaderboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lectures': {
       id: '/lectures'
       path: '/lectures'
@@ -211,11 +257,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LecturesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/messages': {
+      id: '/messages'
+      path: '/messages'
+      fullPath: '/messages'
+      preLoaderRoute: typeof MessagesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/profile': {
       id: '/profile'
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/quiz': {
+      id: '/quiz'
+      path: '/quiz'
+      fullPath: '/quiz'
+      preLoaderRoute: typeof QuizRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/resources': {
@@ -242,8 +302,11 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   EventsRoute: EventsRoute,
   GradesRoute: GradesRoute,
+  LeaderboardRoute: LeaderboardRoute,
   LecturesRoute: LecturesRoute,
+  MessagesRoute: MessagesRoute,
   ProfileRoute: ProfileRoute,
+  QuizRoute: QuizRoute,
   ResourcesRoute: ResourcesRoute,
   TestsRoute: TestsRoute,
 }
