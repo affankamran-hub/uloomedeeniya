@@ -33,7 +33,7 @@ export function UpdatesTab() {
       body: form.body,
       body_ur: form.body_ur || null,
     });
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Update posted");
     setForm({ title: "", title_ur: "", body: "", body_ur: "" });
     qc.invalidateQueries({ queryKey: ["announcements"] });
@@ -41,13 +41,13 @@ export function UpdatesTab() {
 
   const remove = async (id: string) => {
     const { error } = await supabase.from("announcements").delete().eq("id", id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     qc.invalidateQueries({ queryKey: ["announcements"] });
   };
 
   const togglePin = async (id: string, pinned: boolean) => {
     const { error } = await supabase.from("announcements").update({ pinned }).eq("id", id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     qc.invalidateQueries({ queryKey: ["announcements"] });
   };
 
@@ -138,7 +138,7 @@ export function QuizzesTab() {
       })
       .select("id")
       .single();
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Created — now add questions");
     setActiveId((row as { id: string }).id);
     setQuiz({ ...quiz, title: "", title_ur: "", description: "" });
@@ -149,10 +149,9 @@ export function QuizzesTab() {
     e.preventDefault();
     if (!activeId) return;
     const options = question.options.split("\n").map((o) => o.trim()).filter(Boolean);
-    if (options.length < 2) return toast.error("Add at least two options, one per line");
+    if (options.length < 2) { toast.error("Add at least two options, one per line"); return; }
     const correctIndex = Number(question.correct) - 1;
-    if (correctIndex < 0 || correctIndex >= options.length)
-      return toast.error("Correct option number is out of range");
+    if (correctIndex < 0 || correctIndex >= options.length) { toast.error("Correct option number is out of range"); return; }
     const { error } = await supabase.from("quiz_questions").insert({
       quiz_id: activeId,
       prompt: question.prompt,
@@ -160,7 +159,7 @@ export function QuizzesTab() {
       options,
       correct_index: correctIndex,
     });
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Question added");
     setQuestion({ prompt: "", prompt_ur: "", options: "", correct: "1" });
   };
@@ -168,7 +167,7 @@ export function QuizzesTab() {
   const removeQuiz = async (id: string) => {
     if (!window.confirm("Delete this item and all its questions?")) return;
     const { error } = await supabase.from("quizzes").delete().eq("id", id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     if (activeId === id) setActiveId(null);
     qc.invalidateQueries({ queryKey: ["quizzes"] });
   };
