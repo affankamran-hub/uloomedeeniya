@@ -5,6 +5,9 @@ import logo from "@/assets/logo.jpeg.asset.json";
 import { SITE, CATEGORIES } from "@/lib/site";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { UpdatesDrawer } from "@/components/UpdatesDrawer";
+import { AiHelper } from "@/components/AiHelper";
 import {
   Sheet,
   SheetContent,
@@ -20,6 +23,9 @@ const NAV = [
     ur: c.ur,
   })),
   { to: "/events", en: "Events", ur: "پروگرام" },
+  { to: "/quiz", en: "Quiz", ur: "کوئز" },
+  { to: "/leaderboard", en: "Leaderboard", ur: "فہرست" },
+  { to: "/messages", en: "Messages", ur: "پیغامات" },
 ];
 
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
@@ -65,6 +71,8 @@ export function SiteLayout({ children }: { children: ReactNode }) {
           </nav>
 
           <div className="ms-auto flex items-center gap-2 lg:ms-0">
+            <UpdatesDrawer />
+            <ThemeToggle />
             {user ? (
               <>
                 <Button asChild variant="onDark" size="sm">
@@ -101,6 +109,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
       </header>
 
       <main className="flex-1">{children}</main>
+      <AiHelper />
 
       <footer className="hero-surface mt-16 text-primary-foreground">
         <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 md:grid-cols-3">
@@ -134,6 +143,21 @@ export function SiteLayout({ children }: { children: ReactNode }) {
             </ul>
             <p className="urdu mt-4 text-sm text-gold">تعلیمِ دین بالکل مفت ہے</p>
             <p className="text-sm text-primary-foreground/80">No fees — knowledge in Allah's way.</p>
+          </div>
+        </div>
+        <div className="border-t border-primary-foreground/15">
+          <div className="mx-auto max-w-6xl space-y-1 px-4 py-6 text-xs text-primary-foreground/70">
+            <p>
+              Registered and organised under {SITE.org.en} ({SITE.org.ur}) — a recognised welfare and
+              educational trust. Classes of {SITE.institute.en} are conducted by {SITE.organizer.en}.
+            </p>
+            <p className="urdu">
+              {SITE.org.ur} کے تحت رجسٹرڈ و تسلیم شدہ — تمام حقوق محفوظ ہیں۔
+            </p>
+            <p>
+              © {new Date().getFullYear()} {SITE.org.en}. All rights reserved. Content of this website may
+              not be reproduced for commercial use.
+            </p>
           </div>
         </div>
       </footer>

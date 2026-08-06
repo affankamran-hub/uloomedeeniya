@@ -8,6 +8,7 @@ import { SiteLayout } from "@/components/SiteLayout";
 import { useAuth, type Profile } from "@/hooks/useAuth";
 import { CATEGORIES, GRADES, SUBJECTS } from "@/lib/site";
 import { useContent, type ContentRow } from "@/components/ContentSection";
+import { UpdatesTab, QuizzesTab } from "@/components/AdminExtras";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -454,11 +455,15 @@ function AdminPage() {
           <TabsList>
             <TabsTrigger value="members">Members</TabsTrigger>
             <TabsTrigger value="content">Content</TabsTrigger>
+            <TabsTrigger value="updates">Updates</TabsTrigger>
+            <TabsTrigger value="quizzes">Quizzes</TabsTrigger>
           </TabsList>
           <TabsContent value="members" className="mt-6">
             <MembersTab currentUserId={user.id} />
           </TabsContent>
           <TabsContent value="content" className="mt-6"><ContentTab /></TabsContent>
+          <TabsContent value="updates" className="mt-6"><UpdatesTab /></TabsContent>
+          <TabsContent value="quizzes" className="mt-6"><QuizzesTab /></TabsContent>
         </Tabs>
       </div>
     </SiteLayout>

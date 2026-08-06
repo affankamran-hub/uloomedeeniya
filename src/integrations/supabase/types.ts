@@ -14,6 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          role: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      announcements: {
+        Row: {
+          body: string
+          body_ur: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          pinned: boolean
+          title: string
+          title_ur: string | null
+          updated_at: string
+        }
+        Insert: {
+          body?: string
+          body_ur?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          pinned?: boolean
+          title: string
+          title_ur?: string | null
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          body_ur?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          pinned?: boolean
+          title?: string
+          title_ur?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       content: {
         Row: {
           category: string
@@ -56,6 +116,30 @@ export type Database = {
         }
         Relationships: []
       }
+      messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          recipient_id: string | null
+          sender_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          recipient_id?: string | null
+          sender_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          recipient_id?: string | null
+          sender_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           approved: boolean
@@ -83,6 +167,124 @@ export type Database = {
           id?: string
           phone?: string | null
           requested_grade?: number | null
+        }
+        Relationships: []
+      }
+      quiz_attempts: {
+        Row: {
+          created_at: string
+          id: string
+          quiz_id: string
+          score: number
+          total: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          quiz_id: string
+          score?: number
+          total?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          quiz_id?: string
+          score?: number
+          total?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_attempts_quiz_id_fkey"
+            columns: ["quiz_id"]
+            isOneToOne: false
+            referencedRelation: "quizzes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quiz_questions: {
+        Row: {
+          correct_index: number
+          created_at: string
+          id: string
+          options: Json
+          prompt: string
+          prompt_ur: string | null
+          quiz_id: string
+          sort_order: number
+        }
+        Insert: {
+          correct_index?: number
+          created_at?: string
+          id?: string
+          options?: Json
+          prompt: string
+          prompt_ur?: string | null
+          quiz_id: string
+          sort_order?: number
+        }
+        Update: {
+          correct_index?: number
+          created_at?: string
+          id?: string
+          options?: Json
+          prompt?: string
+          prompt_ur?: string | null
+          quiz_id?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_questions_quiz_id_fkey"
+            columns: ["quiz_id"]
+            isOneToOne: false
+            referencedRelation: "quizzes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quizzes: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          grade: number | null
+          id: string
+          is_published: boolean
+          kind: string
+          points_per_question: number
+          subject: string | null
+          title: string
+          title_ur: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          grade?: number | null
+          id?: string
+          is_published?: boolean
+          kind?: string
+          points_per_question?: number
+          subject?: string | null
+          title: string
+          title_ur?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          grade?: number | null
+          id?: string
+          is_published?: boolean
+          kind?: string
+          points_per_question?: number
+          subject?: string | null
+          title?: string
+          title_ur?: string | null
         }
         Relationships: []
       }
@@ -117,9 +319,52 @@ export type Database = {
         Returns: boolean
       }
       is_approved: { Args: { _user_id: string }; Returns: boolean }
+      leaderboard: {
+        Args: never
+        Returns: {
+          attempts: number
+          full_name: string
+          points: number
+          requested_grade: number
+          user_id: string
+        }[]
+      }
+      member_names: {
+        Args: never
+        Returns: {
+          full_name: string
+          id: string
+          requested_grade: number
+        }[]
+      }
+      submit_quiz: {
+        Args: { _answers: Json; _quiz_id: string }
+        Returns: {
+          score: number
+          total: number
+        }[]
+      }
+      take_quiz: {
+        Args: { _quiz_id: string }
+        Returns: {
+          id: string
+          options: Json
+          prompt: string
+          prompt_ur: string
+          sort_order: number
+        }[]
+      }
+      teacher_list: {
+        Args: never
+        Returns: {
+          full_name: string
+          id: string
+          role: string
+        }[]
+      }
     }
     Enums: {
-      app_role: "admin" | "member"
+      app_role: "admin" | "member" | "teacher"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -247,7 +492,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "member"],
+      app_role: ["admin", "member", "teacher"],
     },
   },
 } as const

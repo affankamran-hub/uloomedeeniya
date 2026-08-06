@@ -17,6 +17,7 @@ export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isTeacher, setIsTeacher] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -26,6 +27,7 @@ export function useAuth() {
       if (!s?.user) {
         setProfile(null);
         setIsAdmin(false);
+        setIsTeacher(false);
       }
       setLoading(false);
     });
@@ -48,11 +50,20 @@ export function useAuth() {
       if (!active) return;
       setProfile((p as Profile) ?? null);
       setIsAdmin(!!roles?.some((r: { role: string }) => r.role === "admin"));
+      setIsTeacher(!!roles?.some((r: { role: string }) => r.role === "teacher"));
     })();
     return () => {
       active = false;
     };
   }, [user]);
 
-  return { session, user, profile, isAdmin, loading, signOut: () => supabase.auth.signOut() };
+  return {
+    session,
+    user,
+    profile,
+    isAdmin,
+    isTeacher,
+    loading,
+    signOut: () => supabase.auth.signOut(),
+  };
 }
