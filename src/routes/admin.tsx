@@ -9,6 +9,8 @@ import { useAuth, type Profile } from "@/hooks/useAuth";
 import { CATEGORIES, GRADES, SUBJECTS } from "@/lib/site";
 import { useContent, type ContentRow } from "@/components/ContentSection";
 import { UpdatesTab, QuizzesTab } from "@/components/AdminExtras";
+import { ActivityTab } from "@/components/AdminActivity";
+import { MATERIALS_BUCKET, STORAGE_PREFIX, isStorageUrl, storagePath } from "@/lib/materials";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -87,6 +89,16 @@ function MembersTab({ currentUserId }: { currentUserId: string }) {
       return;
     }
     toast.success("Grade updated");
+    refresh();
+  };
+
+  const setName = async (id: string, full_name: string) => {
+    const { error } = await supabase.from("profiles").update({ full_name }).eq("id", id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Name updated");
     refresh();
   };
 
@@ -178,6 +190,11 @@ function MembersTab({ currentUserId }: { currentUserId: string }) {
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
+              <NameEditor
+                key={p.full_name}
+                initial={p.full_name}
+                onSave={(name) => setName(p.id, name)}
+              />
               <Select
                 value={p.requested_grade ? String(p.requested_grade) : "none"}
                 onValueChange={(v) => setGrade(p.id, v)}
