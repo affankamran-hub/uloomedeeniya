@@ -550,6 +550,7 @@ function AdminPage() {
           <TabsContent value="content" className="mt-6"><ContentTab /></TabsContent>
           <TabsContent value="updates" className="mt-6"><UpdatesTab /></TabsContent>
           <TabsContent value="quizzes" className="mt-6"><QuizzesTab /></TabsContent>
+          <TabsContent value="activity" className="mt-6"><ActivityTab /></TabsContent>
         </Tabs>
       </div>
     </SiteLayout>
