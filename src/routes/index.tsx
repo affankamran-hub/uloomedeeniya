@@ -133,7 +133,8 @@ function Home() {
         <h2 className="text-2xl">Subjects <span className="urdu text-primary">مضامین</span></h2>
         <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {SUBJECTS.map((s) => (
-            <Card key={s.key} className="card-soft">
+            <Link key={s.key} to="/subject/$key" params={{ key: s.key }} className="block">
+            <Card className="card-soft h-full transition-colors hover:border-primary">
               <CardHeader className="pb-2">
                 <BookOpen className="size-5 text-primary" />
                 <CardTitle className="mt-2 text-lg">{s.en}</CardTitle>
@@ -143,8 +144,10 @@ function Home() {
                 <p className="text-sm font-medium text-foreground">{s.meaning}</p>
                 <p className="text-sm text-muted-foreground">{s.detail}</p>
                 <p className="urdu text-sm leading-loose text-muted-foreground">{s.detailUr}</p>
+                <p className="pt-1 text-sm font-medium text-primary">Open subject →</p>
               </CardContent>
             </Card>
+            </Link>
           ))}
         </div>
       </section>

@@ -9,6 +9,8 @@ import { useAuth, type Profile } from "@/hooks/useAuth";
 import { CATEGORIES, GRADES, SUBJECTS } from "@/lib/site";
 import { useContent, type ContentRow } from "@/components/ContentSection";
 import { UpdatesTab, QuizzesTab } from "@/components/AdminExtras";
+import { ActivityTab } from "@/components/AdminActivity";
+import { MATERIALS_BUCKET, STORAGE_PREFIX, isStorageUrl, storagePath } from "@/lib/materials";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -42,6 +44,32 @@ export const Route = createFileRoute("/admin")({
 });
 
 function MembersTab({ currentUserId }: { currentUserId: string }) {
+  return <MembersTabInner currentUserId={currentUserId} />;
+}
+
+function NameEditor({ initial, onSave }: { initial: string; onSave: (name: string) => void }) {
+  const [value, setValue] = useState(initial);
+  return (
+    <div className="flex items-center gap-2">
+      <Input
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        placeholder="Full name"
+        className="w-52"
+      />
+      <Button
+        size="sm"
+        variant="outline"
+        disabled={value.trim() === initial.trim() || !value.trim()}
+        onClick={() => onSave(value.trim())}
+      >
+        Save name
+      </Button>
+    </div>
+  );
+}
+
+function MembersTabInner({ currentUserId }: { currentUserId: string }) {
   const qc = useQueryClient();
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"all" | "pending" | "approved">("all");
@@ -87,6 +115,16 @@ function MembersTab({ currentUserId }: { currentUserId: string }) {
       return;
     }
     toast.success("Grade updated");
+    refresh();
+  };
+
+  const setName = async (id: string, full_name: string) => {
+    const { error } = await supabase.from("profiles").update({ full_name }).eq("id", id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Name updated");
     refresh();
   };
 
@@ -178,6 +216,11 @@ function MembersTab({ currentUserId }: { currentUserId: string }) {
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
+              <NameEditor
+                key={p.full_name}
+                initial={p.full_name}
+                onSave={(name) => setName(p.id, name)}
+              />
               <Select
                 value={p.requested_grade ? String(p.requested_grade) : "none"}
                 onValueChange={(v) => setGrade(p.id, v)}
@@ -235,6 +278,7 @@ function ContentTab() {
   const qc = useQueryClient();
   const { data } = useContent();
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
   const [form, setForm] = useState({
     category: "resource",
     grade: "1",
@@ -301,6 +345,9 @@ function ContentTab() {
 
   const remove = async (item: ContentRow) => {
     if (!window.confirm(`Delete "${item.title}"?`)) return;
+    if (isStorageUrl(item.url)) {
+      await supabase.storage.from(MATERIALS_BUCKET).remove([storagePath(item.url!)]);
+    }
     const { error } = await supabase.from("content").delete().eq("id", item.id);
     if (error) {
       toast.error(error.message);
@@ -309,6 +356,22 @@ function ContentTab() {
     toast.success("Deleted");
     if (editingId === item.id) reset();
     qc.invalidateQueries({ queryKey: ["content"] });
+  };
+
+  const uploadFile = async (file: File) => {
+    setUploading(true);
+    const safe = file.name.replace(/[^\w.\-]+/g, "_");
+    const path = `grade-${form.grade}/${form.subject}/${Date.now()}-${safe}`;
+    const { error } = await supabase.storage
+      .from(MATERIALS_BUCKET)
+      .upload(path, file, { contentType: file.type || "application/pdf" });
+    setUploading(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    setForm((f) => ({ ...f, url: `${STORAGE_PREFIX}${path}`, title: f.title || file.name }));
+    toast.success("File uploaded — now publish it");
   };
 
   return (
@@ -372,6 +435,28 @@ function ContentTab() {
               <Label>Link (PDF / video URL)</Label>
               <Input value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} />
             </div>
+            {form.category !== "event" && (
+              <div className="space-y-2">
+                <Label>Or upload a PDF for this grade &amp; subject</Label>
+                <Input
+                  type="file"
+                  accept="application/pdf,.pdf,.doc,.docx,image/*"
+                  disabled={uploading}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) void uploadFile(file);
+                    e.target.value = "";
+                  }}
+                />
+                <p className="text-xs text-muted-foreground">
+                  {uploading
+                    ? "Uploading…"
+                    : isStorageUrl(form.url)
+                      ? `Attached: ${storagePath(form.url)}`
+                      : "Uploaded files are visible to approved students only."}
+                </p>
+              </div>
+            )}
             {form.category === "event" && (
               <div className="space-y-2">
                 <Label>Event date</Label>
@@ -457,6 +542,7 @@ function AdminPage() {
             <TabsTrigger value="content">Content</TabsTrigger>
             <TabsTrigger value="updates">Updates</TabsTrigger>
             <TabsTrigger value="quizzes">Quizzes</TabsTrigger>
+            <TabsTrigger value="activity">Activity</TabsTrigger>
           </TabsList>
           <TabsContent value="members" className="mt-6">
             <MembersTab currentUserId={user.id} />
@@ -464,6 +550,7 @@ function AdminPage() {
           <TabsContent value="content" className="mt-6"><ContentTab /></TabsContent>
           <TabsContent value="updates" className="mt-6"><UpdatesTab /></TabsContent>
           <TabsContent value="quizzes" className="mt-6"><QuizzesTab /></TabsContent>
+          <TabsContent value="activity" className="mt-6"><ActivityTab /></TabsContent>
         </Tabs>
       </div>
     </SiteLayout>

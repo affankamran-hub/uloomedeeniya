@@ -1,7 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { CalendarDays, FileText, Link2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { GRADES, subjectName } from "@/lib/site";
+import { isStorageUrl, signedMaterialUrl } from "@/lib/materials";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -66,7 +68,28 @@ export function ContentCards({ items }: { items: ContentRow[] }) {
                 {new Date(item.event_date).toLocaleString()}
               </p>
             )}
-            {item.url && (
+            {item.url && isStorageUrl(item.url) && (
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    const url = await signedMaterialUrl(item.url!);
+                    window.open(url, "_blank", "noopener");
+                  } catch (err) {
+                    toast.error(
+                      err instanceof Error
+                        ? "Sign in with an approved account to open this file."
+                        : "Could not open this file.",
+                    );
+                  }
+                }}
+                className="inline-flex items-center gap-2 font-medium text-primary underline-offset-4 hover:underline"
+              >
+                <FileText className="size-4" />
+                Open file / فائل کھولیں
+              </button>
+            )}
+            {item.url && !isStorageUrl(item.url) && (
               <a
                 href={item.url}
                 target="_blank"
