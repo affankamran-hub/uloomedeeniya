@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { z } from "zod";
 import { SiteLayout } from "@/components/SiteLayout";
 import { ContentCards, useContent } from "@/components/ContentSection";
@@ -33,7 +33,8 @@ function GradePanel({ grade }: { grade: number }) {
     <div className="space-y-8">
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {SUBJECTS.map((s) => (
-          <Card key={s.key} className="card-soft">
+          <Link key={s.key} to="/subject/$key" params={{ key: s.key }} className="block">
+          <Card className="card-soft h-full transition-colors hover:border-primary">
             <CardHeader className="pb-2">
               <CardTitle className="text-base">{s.en}</CardTitle>
               <p className="urdu text-lg text-primary">{s.ur}</p>
@@ -42,8 +43,10 @@ function GradePanel({ grade }: { grade: number }) {
               <p className="font-medium text-foreground">{s.meaning}</p>
               <p className="text-muted-foreground">{s.detail}</p>
               <p className="urdu leading-loose text-muted-foreground">{s.detailUr}</p>
+              <p className="pt-1 font-medium text-primary">Open subject →</p>
             </CardContent>
           </Card>
+          </Link>
         ))}
       </div>
 
