@@ -44,6 +44,32 @@ export const Route = createFileRoute("/admin")({
 });
 
 function MembersTab({ currentUserId }: { currentUserId: string }) {
+  return <MembersTabInner currentUserId={currentUserId} />;
+}
+
+function NameEditor({ initial, onSave }: { initial: string; onSave: (name: string) => void }) {
+  const [value, setValue] = useState(initial);
+  return (
+    <div className="flex items-center gap-2">
+      <Input
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        placeholder="Full name"
+        className="w-52"
+      />
+      <Button
+        size="sm"
+        variant="outline"
+        disabled={value.trim() === initial.trim() || !value.trim()}
+        onClick={() => onSave(value.trim())}
+      >
+        Save name
+      </Button>
+    </div>
+  );
+}
+
+function MembersTabInner({ currentUserId }: { currentUserId: string }) {
   const qc = useQueryClient();
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"all" | "pending" | "approved">("all");
