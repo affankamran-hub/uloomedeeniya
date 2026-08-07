@@ -542,6 +542,7 @@ function AdminPage() {
             <TabsTrigger value="content">Content</TabsTrigger>
             <TabsTrigger value="updates">Updates</TabsTrigger>
             <TabsTrigger value="quizzes">Quizzes</TabsTrigger>
+            <TabsTrigger value="activity">Activity</TabsTrigger>
           </TabsList>
           <TabsContent value="members" className="mt-6">
             <MembersTab currentUserId={user.id} />
