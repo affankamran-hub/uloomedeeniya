@@ -349,6 +349,15 @@ function ContentTab() {
       await supabase.storage.from(MATERIALS_BUCKET).remove([storagePath(item.url!)]);
     }
     const { error } = await supabase.from("content").delete().eq("id", item.id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Deleted");
+    if (editingId === item.id) reset();
+    qc.invalidateQueries({ queryKey: ["content"] });
+  };
+
   const uploadFile = async (file: File) => {
     setUploading(true);
     const safe = file.name.replace(/[^\w.\-]+/g, "_");
@@ -363,15 +372,6 @@ function ContentTab() {
     }
     setForm((f) => ({ ...f, url: `${STORAGE_PREFIX}${path}`, title: f.title || file.name }));
     toast.success("File uploaded — now publish it");
-  };
-
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-    toast.success("Deleted");
-    if (editingId === item.id) reset();
-    qc.invalidateQueries({ queryKey: ["content"] });
   };
 
   return (
