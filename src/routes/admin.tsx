@@ -278,6 +278,7 @@ function ContentTab() {
   const qc = useQueryClient();
   const { data } = useContent();
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
   const [form, setForm] = useState({
     category: "resource",
     grade: "1",
@@ -344,7 +345,26 @@ function ContentTab() {
 
   const remove = async (item: ContentRow) => {
     if (!window.confirm(`Delete "${item.title}"?`)) return;
+    if (isStorageUrl(item.url)) {
+      await supabase.storage.from(MATERIALS_BUCKET).remove([storagePath(item.url!)]);
+    }
     const { error } = await supabase.from("content").delete().eq("id", item.id);
+  const uploadFile = async (file: File) => {
+    setUploading(true);
+    const safe = file.name.replace(/[^\w.\-]+/g, "_");
+    const path = `grade-${form.grade}/${form.subject}/${Date.now()}-${safe}`;
+    const { error } = await supabase.storage
+      .from(MATERIALS_BUCKET)
+      .upload(path, file, { contentType: file.type || "application/pdf" });
+    setUploading(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    setForm((f) => ({ ...f, url: `${STORAGE_PREFIX}${path}`, title: f.title || file.name }));
+    toast.success("File uploaded — now publish it");
+  };
+
     if (error) {
       toast.error(error.message);
       return;
@@ -415,6 +435,28 @@ function ContentTab() {
               <Label>Link (PDF / video URL)</Label>
               <Input value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} />
             </div>
+            {form.category !== "event" && (
+              <div className="space-y-2">
+                <Label>Or upload a PDF for this grade &amp; subject</Label>
+                <Input
+                  type="file"
+                  accept="application/pdf,.pdf,.doc,.docx,image/*"
+                  disabled={uploading}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) void uploadFile(file);
+                    e.target.value = "";
+                  }}
+                />
+                <p className="text-xs text-muted-foreground">
+                  {uploading
+                    ? "Uploading…"
+                    : isStorageUrl(form.url)
+                      ? `Attached: ${storagePath(form.url)}`
+                      : "Uploaded files are visible to approved students only."}
+                </p>
+              </div>
+            )}
             {form.category === "event" && (
               <div className="space-y-2">
                 <Label>Event date</Label>
