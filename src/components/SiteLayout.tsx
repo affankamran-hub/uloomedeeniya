@@ -2,41 +2,28 @@ import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { Menu } from "lucide-react";
 import logo from "@/assets/logo.jpeg.asset.json";
-import { SITE, CATEGORIES } from "@/lib/site";
+import { SITE } from "@/lib/site";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { UpdatesDrawer } from "@/components/UpdatesDrawer";
 import { AiHelper } from "@/components/AiHelper";
+import { SideNav, SideNavLinks, PRIMARY_NAV, SIDE_NAV } from "@/components/SideNav";
 import {
   Sheet,
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet";
 
-const NAV = [
-  { to: "/", en: "Home", ur: "صفحۂ اول" },
-  { to: "/grades", en: "Grades", ur: "درجات" },
-  ...CATEGORIES.filter((c) => c.key !== "event").map((c) => ({
-    to: `/${c.key}s` as string,
-    en: c.en,
-    ur: c.ur,
-  })),
-  { to: "/events", en: "Events", ur: "پروگرام" },
-  { to: "/quiz", en: "Quiz", ur: "کوئز" },
-  { to: "/leaderboard", en: "Leaderboard", ur: "فہرست" },
-  { to: "/messages", en: "Messages", ur: "پیغامات" },
-];
-
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <>
-      {NAV.map((item) => (
+      {PRIMARY_NAV.map((item) => (
         <Link
           key={item.to}
           to={item.to}
           onClick={onNavigate}
-          className="rounded-md px-3 py-2 text-sm font-medium text-primary-foreground/80 transition-colors hover:bg-primary-foreground/10 hover:text-primary-foreground data-[status=active]:bg-primary-foreground/15 data-[status=active]:text-gold"
+          className="whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium text-primary-foreground/80 transition-colors hover:bg-primary-foreground/10 hover:text-primary-foreground data-[status=active]:bg-primary-foreground/15 data-[status=active]:text-gold"
         >
           {item.en} <span className="urdu ms-1 text-xs">{item.ur}</span>
         </Link>
@@ -51,14 +38,14 @@ export function SiteLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <header className="hero-surface sticky top-0 z-40 border-b border-primary-foreground/10">
-        <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3">
+        <div className="mx-auto flex w-full max-w-[1400px] items-center gap-3 px-4 py-3">
           <Link to="/" className="flex items-center gap-3">
             <img
               src={logo.url}
               alt="Tauheed Trust official logo"
               className="size-11 rounded-full ring-2 ring-gold/70"
             />
-            <span className="leading-tight">
+            <span className="hidden leading-tight sm:block">
               <span className="block font-display text-lg text-primary-foreground">
                 {SITE.org.en}
               </span>
@@ -66,24 +53,24 @@ export function SiteLayout({ children }: { children: ReactNode }) {
             </span>
           </Link>
 
-          <nav className="mx-auto hidden items-center gap-1 lg:flex">
+          <nav className="hidden items-center gap-1 lg:flex">
             <NavLinks />
           </nav>
 
-          <div className="ms-auto flex items-center gap-2 lg:ms-0">
+          <div className="ms-auto flex items-center gap-2">
             <UpdatesDrawer />
             <ThemeToggle />
             {user ? (
               <>
-                <Button asChild variant="onDark" size="sm">
+                <Button asChild variant="onDark" size="sm" className="hidden sm:inline-flex">
                   <Link to="/profile">Profile</Link>
                 </Button>
                 {isAdmin && (
-                  <Button asChild variant="secondary" size="sm">
+                  <Button asChild variant="secondary" size="sm" className="hidden sm:inline-flex">
                     <Link to="/admin">Admin</Link>
                   </Button>
                 )}
-                <Button size="sm" variant="onDark" onClick={() => signOut()}>
+                <Button size="sm" variant="onDark" onClick={() => signOut()} className="hidden sm:inline-flex">
                   Sign out
                 </Button>
               </>
@@ -98,9 +85,14 @@ export function SiteLayout({ children }: { children: ReactNode }) {
                   <Menu className="size-4" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="hero-surface w-72">
+              <SheetContent side="left" className="w-72 overflow-y-auto bg-card">
                 <nav className="mt-10 flex flex-col gap-1">
-                  <NavLinks />
+                  <SideNavLinks items={PRIMARY_NAV.concat(SIDE_NAV)} />
+                  {user && (
+                    <Button variant="outline" className="mt-4" onClick={() => signOut()}>
+                      Sign out
+                    </Button>
+                  )}
                 </nav>
               </SheetContent>
             </Sheet>
@@ -108,7 +100,10 @@ export function SiteLayout({ children }: { children: ReactNode }) {
         </div>
       </header>
 
-      <main className="flex-1">{children}</main>
+      <div className="flex flex-1">
+        <SideNav user={!!user} isAdmin={isAdmin} />
+        <main className="min-w-0 flex-1">{children}</main>
+      </div>
       <AiHelper />
 
       <footer className="hero-surface mt-16 text-primary-foreground">

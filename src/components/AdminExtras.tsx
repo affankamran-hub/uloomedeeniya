@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -105,6 +105,134 @@ export function UpdatesTab() {
   );
 }
 
+type AdminQuestion = {
+  id: string;
+  prompt: string;
+  prompt_ur: string | null;
+  options: unknown;
+  correct_index: number;
+  sort_order: number;
+};
+
+function QuestionManager({ quizId }: { quizId: string }) {
+  const qc = useQueryClient();
+  const key = ["admin-questions", quizId];
+  const { data, isLoading } = useQuery({
+    queryKey: key,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("quiz_questions")
+        .select("*")
+        .eq("quiz_id", quizId)
+        .order("sort_order")
+        .order("created_at");
+      if (error) throw error;
+      return (data ?? []) as unknown as AdminQuestion[];
+    },
+  });
+  const [editing, setEditing] = useState<string | null>(null);
+  const [draft, setDraft] = useState({ prompt: "", prompt_ur: "", options: "", correct: "1" });
+
+  const startEdit = (q: AdminQuestion) => {
+    setEditing(q.id);
+    setDraft({
+      prompt: q.prompt,
+      prompt_ur: q.prompt_ur ?? "",
+      options: (Array.isArray(q.options) ? (q.options as string[]) : []).join("\n"),
+      correct: String(q.correct_index + 1),
+    });
+  };
+
+  const save = async (id: string) => {
+    const options = draft.options.split("\n").map((o) => o.trim()).filter(Boolean);
+    if (options.length < 2) { toast.error("Add at least two options, one per line"); return; }
+    const correctIndex = Number(draft.correct) - 1;
+    if (correctIndex < 0 || correctIndex >= options.length) { toast.error("Correct option number is out of range"); return; }
+    const { error } = await supabase
+      .from("quiz_questions")
+      .update({
+        prompt: draft.prompt,
+        prompt_ur: draft.prompt_ur || null,
+        options,
+        correct_index: correctIndex,
+      })
+      .eq("id", id);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Question updated");
+    setEditing(null);
+    qc.invalidateQueries({ queryKey: key });
+  };
+
+  const remove = async (id: string) => {
+    const { error } = await supabase.from("quiz_questions").delete().eq("id", id);
+    if (error) { toast.error(error.message); return; }
+    qc.invalidateQueries({ queryKey: key });
+  };
+
+  if (isLoading) return <p className="text-sm text-muted-foreground">Loading questions…</p>;
+  const questions = data ?? [];
+  if (questions.length === 0)
+    return <p className="text-sm text-muted-foreground">No MCQs yet — add one above.</p>;
+
+  return (
+    <div className="space-y-3">
+      {questions.map((q, i) => {
+        const options = Array.isArray(q.options) ? (q.options as string[]) : [];
+        if (editing === q.id) {
+          return (
+            <div key={q.id} className="space-y-3 rounded-lg border border-border p-4">
+              <div className="space-y-2">
+                <Label>Question (English)</Label>
+                <Input value={draft.prompt} onChange={(e) => setDraft({ ...draft, prompt: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label>Question (اردو)</Label>
+                <Input className="urdu" value={draft.prompt_ur} onChange={(e) => setDraft({ ...draft, prompt_ur: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label>Options — one per line</Label>
+                <Textarea rows={4} value={draft.options} onChange={(e) => setDraft({ ...draft, options: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label>Correct option number</Label>
+                <Input type="number" min={1} value={draft.correct} onChange={(e) => setDraft({ ...draft, correct: e.target.value })} />
+              </div>
+              <div className="flex gap-2">
+                <Button size="sm" onClick={() => save(q.id)}>Save</Button>
+                <Button size="sm" variant="outline" onClick={() => setEditing(null)}>Cancel</Button>
+              </div>
+            </div>
+          );
+        }
+        return (
+          <div key={q.id} className="rounded-lg border border-border p-4">
+            <div className="flex flex-wrap items-start gap-3">
+              <div className="min-w-0 flex-1">
+                <p className="font-medium">{i + 1}. {q.prompt}</p>
+                {q.prompt_ur && <p className="urdu text-sm text-muted-foreground">{q.prompt_ur}</p>}
+                <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
+                  {options.map((o, oi) => (
+                    <li key={oi} className={oi === q.correct_index ? "font-medium text-primary" : ""}>
+                      {String.fromCharCode(65 + oi)}. {o}
+                      {oi === q.correct_index && " ✓"}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="flex gap-2">
+                <Button size="sm" variant="outline" onClick={() => startEdit(q)}>Edit</Button>
+                <Button size="icon" variant="outline" onClick={() => remove(q.id)} aria-label="Delete question">
+                  <Trash2 className="size-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export function QuizzesTab() {
   const qc = useQueryClient();
   const { data } = useQuizzes();
@@ -162,6 +290,7 @@ export function QuizzesTab() {
     if (error) { toast.error(error.message); return; }
     toast.success("Question added");
     setQuestion({ prompt: "", prompt_ur: "", options: "", correct: "1" });
+    qc.invalidateQueries({ queryKey: ["admin-questions", activeId] });
   };
 
   const removeQuiz = async (id: string) => {
@@ -169,6 +298,12 @@ export function QuizzesTab() {
     const { error } = await supabase.from("quizzes").delete().eq("id", id);
     if (error) { toast.error(error.message); return; }
     if (activeId === id) setActiveId(null);
+    qc.invalidateQueries({ queryKey: ["quizzes"] });
+  };
+
+  const togglePublish = async (id: string, is_published: boolean) => {
+    const { error } = await supabase.from("quizzes").update({ is_published }).eq("id", id);
+    if (error) { toast.error(error.message); return; }
     qc.invalidateQueries({ queryKey: ["quizzes"] });
   };
 
@@ -231,7 +366,7 @@ export function QuizzesTab() {
 
         {activeId && (
           <Card className="card-soft">
-            <CardHeader><CardTitle>Add a question</CardTitle></CardHeader>
+            <CardHeader><CardTitle>Add an MCQ</CardTitle></CardHeader>
             <CardContent>
               <form onSubmit={addQuestion} className="space-y-4">
                 <div className="space-y-2">
@@ -263,18 +398,29 @@ export function QuizzesTab() {
             <CardContent className="flex flex-wrap items-center gap-3 py-4">
               <Badge variant="secondary">{q.kind}</Badge>
               {q.grade && <Badge variant="outline">Grade {q.grade}</Badge>}
+              <Badge variant={q.is_published ? "default" : "outline"}>
+                {q.is_published ? "Published" : "Draft"}
+              </Badge>
               <div>
                 <p className="font-medium">{q.title}</p>
                 {q.title_ur && <p className="urdu text-sm text-muted-foreground">{q.title_ur}</p>}
               </div>
               <div className="ms-auto flex gap-2">
+                <Button size="sm" variant="outline" onClick={() => togglePublish(q.id, !q.is_published)}>
+                  {q.is_published ? "Unpublish" : "Publish"}
+                </Button>
                 <Button size="sm" variant={activeId === q.id ? "default" : "outline"} onClick={() => setActiveId(q.id)}>
-                  Add questions
+                  {activeId === q.id ? "Editing MCQs" : "Manage MCQs"}
                 </Button>
                 <Button size="icon" variant="outline" onClick={() => removeQuiz(q.id)} aria-label="Delete">
                   <Trash2 className="size-4" />
                 </Button>
               </div>
+              {activeId === q.id && (
+                <div className="w-full border-t border-border pt-4">
+                  <QuestionManager quizId={q.id} />
+                </div>
+              )}
             </CardContent>
           </Card>
         ))}
