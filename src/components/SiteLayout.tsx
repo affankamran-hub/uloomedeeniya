@@ -87,16 +87,12 @@ export function SiteLayout({ children }: { children: ReactNode }) {
               </SheetTrigger>
               <SheetContent side="left" className="w-72 overflow-y-auto bg-card">
                 <nav className="mt-10 flex flex-col gap-1">
-                  {PRIMARY_NAV.concat(SIDE_NAV).map(() => null)}
                   <SideNavLinks items={PRIMARY_NAV.concat(SIDE_NAV)} />
                   {user && (
                     <Button variant="outline" className="mt-4" onClick={() => signOut()}>
                       Sign out
                     </Button>
                   )}
-                </nav>
-                <nav className="hidden">
-                  <NavLinks />
                 </nav>
               </SheetContent>
             </Sheet>

@@ -24,8 +24,9 @@ export const Route = createFileRoute("/subject/$key")({
       ],
     };
   },
-  beforeLoad: ({ params }) => {
+  loader: ({ params }) => {
     if (!subjectName(params.key)) throw notFound();
+    return {};
   },
   notFoundComponent: () => (
     <SiteLayout>
