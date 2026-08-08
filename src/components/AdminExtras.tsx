@@ -366,7 +366,7 @@ export function QuizzesTab() {
 
         {activeId && (
           <Card className="card-soft">
-            <CardHeader><CardTitle>Add a question</CardTitle></CardHeader>
+            <CardHeader><CardTitle>Add an MCQ</CardTitle></CardHeader>
             <CardContent>
               <form onSubmit={addQuestion} className="space-y-4">
                 <div className="space-y-2">
@@ -398,18 +398,29 @@ export function QuizzesTab() {
             <CardContent className="flex flex-wrap items-center gap-3 py-4">
               <Badge variant="secondary">{q.kind}</Badge>
               {q.grade && <Badge variant="outline">Grade {q.grade}</Badge>}
+              <Badge variant={q.is_published ? "default" : "outline"}>
+                {q.is_published ? "Published" : "Draft"}
+              </Badge>
               <div>
                 <p className="font-medium">{q.title}</p>
                 {q.title_ur && <p className="urdu text-sm text-muted-foreground">{q.title_ur}</p>}
               </div>
               <div className="ms-auto flex gap-2">
+                <Button size="sm" variant="outline" onClick={() => togglePublish(q.id, !q.is_published)}>
+                  {q.is_published ? "Unpublish" : "Publish"}
+                </Button>
                 <Button size="sm" variant={activeId === q.id ? "default" : "outline"} onClick={() => setActiveId(q.id)}>
-                  Add questions
+                  {activeId === q.id ? "Editing MCQs" : "Manage MCQs"}
                 </Button>
                 <Button size="icon" variant="outline" onClick={() => removeQuiz(q.id)} aria-label="Delete">
                   <Trash2 className="size-4" />
                 </Button>
               </div>
+              {activeId === q.id && (
+                <div className="w-full border-t border-border pt-4">
+                  <QuestionManager quizId={q.id} />
+                </div>
+              )}
             </CardContent>
           </Card>
         ))}
