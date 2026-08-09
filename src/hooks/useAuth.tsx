@@ -18,10 +18,15 @@ export function useAuth() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isTeacher, setIsTeacher] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [accountLoading, setAccountLoading] = useState(false);
 
   useEffect(() => {
+    let active = true;
+    let authRevision = 0;
     const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
+      authRevision += 1;
+      if (!active) return;
       setSession(s);
       setUser(s?.user ?? null);
       if (!s?.user) {
@@ -29,28 +34,43 @@ export function useAuth() {
         setIsAdmin(false);
         setIsTeacher(false);
       }
-      setLoading(false);
+      setAuthLoading(false);
     });
+    const initialRevision = authRevision;
     supabase.auth.getSession().then(({ data }) => {
+      if (!active || initialRevision !== authRevision) return;
       setSession(data.session);
       setUser(data.session?.user ?? null);
-      setLoading(false);
+      setAuthLoading(false);
     });
-    return () => sub.subscription.unsubscribe();
+    return () => {
+      active = false;
+      sub.subscription.unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setAccountLoading(false);
+      return;
+    }
     let active = true;
+    setAccountLoading(true);
+    setProfile(null);
+    setIsAdmin(false);
+    setIsTeacher(false);
     (async () => {
-      const [{ data: p }, { data: roles }] = await Promise.all([
+      const [{ data: p, error: profileError }, { data: roles, error: rolesError }] = await Promise.all([
         supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
         supabase.from("user_roles").select("role").eq("user_id", user.id),
       ]);
       if (!active) return;
-      setProfile((p as Profile) ?? null);
-      setIsAdmin(!!roles?.some((r: { role: string }) => r.role === "admin"));
-      setIsTeacher(!!roles?.some((r: { role: string }) => r.role === "teacher"));
+      if (!profileError) setProfile((p as Profile) ?? null);
+      if (!rolesError) {
+        setIsAdmin(!!roles?.some((r: { role: string }) => r.role === "admin"));
+        setIsTeacher(!!roles?.some((r: { role: string }) => r.role === "teacher"));
+      }
+      setAccountLoading(false);
     })();
     return () => {
       active = false;
@@ -63,7 +83,7 @@ export function useAuth() {
     profile,
     isAdmin,
     isTeacher,
-    loading,
+    loading: authLoading || (!!user && accountLoading),
     signOut: () => supabase.auth.signOut(),
   };
 }
