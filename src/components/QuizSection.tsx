@@ -48,6 +48,7 @@ function QuizRunner({ quiz, onDone }: { quiz: QuizRow; onDone: () => void }) {
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [result, setResult] = useState<{ score: number; total: number } | null>(null);
   const [busy, setBusy] = useState(false);
+  const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery({
     queryKey: ["quiz-questions", quiz.id],
@@ -71,6 +72,7 @@ function QuizRunner({ quiz, onDone }: { quiz: QuizRow; onDone: () => void }) {
     }
     const row = (data as unknown as { score: number; total: number }[])?.[0];
     setResult(row ?? { score: 0, total: 0 });
+    queryClient.invalidateQueries({ queryKey: ["leaderboard"] });
     toast.success("Answers submitted");
   };
 
