@@ -78,8 +78,11 @@ function AuthPage() {
       );
   };
 
+  const [googleErrorDetails, setGoogleErrorDetails] = useState<string | null>(null);
+
   const google = async () => {
     setBusy(true);
+    setGoogleErrorDetails(null);
     try {
       const redirectUri = typeof window !== "undefined" ? `${window.location.origin}/auth` : undefined;
       const { data, error } = await supabase.auth.signInWithOAuth({
@@ -89,21 +92,24 @@ function AuthPage() {
           queryParams: { prompt: "select_account" },
         },
       });
+
       if (error) {
+        console.warn("Supabase Google OAuth error:", error);
         if (
+          error.message?.toLowerCase().includes("missing oauth secret") ||
           error.message?.toLowerCase().includes("unsupported provider") ||
-          error.message?.toLowerCase().includes("not enabled") ||
-          error.message?.toLowerCase().includes("provider is not enabled")
+          error.message?.toLowerCase().includes("not enabled")
         ) {
-          toast.error(
-            "Google sign-in requires enabling the Google provider in your Supabase dashboard (Authentication -> Providers -> Google). You can log in using Email & Password below!",
-            { duration: 7000 }
+          setGoogleErrorDetails(
+            "Google Sign-In has not been configured with Google Cloud credentials in your Supabase project (cfxzgqnjrtbdvimzomxe) yet. Please sign in with Email & Password below, or add your Google Client ID & Secret in Supabase Authentication Providers."
           );
+          toast.error("Google Sign-In requires configuration in Supabase. Please use Email & Password below.");
         } else {
           toast.error(error.message || "Google sign-in failed. Please try again.");
         }
         return;
       }
+
       if (data?.url) {
         window.location.assign(data.url);
       }
@@ -224,6 +230,23 @@ function AuthPage() {
               <Button variant="outline" className="w-full" onClick={google} disabled={busy}>
                 Continue with Google / گوگل سے داخلہ
               </Button>
+
+              {googleErrorDetails && (
+                <div className="rounded-lg border border-amber-500/40 bg-amber-500/10 p-3.5 text-xs text-muted-foreground space-y-2">
+                  <p className="font-semibold text-amber-700 dark:text-amber-300">
+                    ⚠️ Google OAuth Setup Needed in Supabase
+                  </p>
+                  <p className="text-[11px] leading-relaxed">
+                    To enable one-click Google Sign-In, enter your Google Cloud Client ID and Secret in:
+                  </p>
+                  <p className="text-[11px] font-mono bg-background p-1.5 rounded border border-border">
+                    Supabase Dashboard → Authentication → Providers → Google
+                  </p>
+                  <p className="text-[11px] text-foreground font-medium">
+                    ✓ In the meantime, please use <strong>Email &amp; Password</strong> above to log in or register immediately!
+                  </p>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>

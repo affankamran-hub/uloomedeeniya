@@ -322,10 +322,17 @@ function Home() {
                 <MapPin className="size-5" />
                 <CardTitle className="text-xl">Class Location &amp; Venue <span className="urdu font-normal">مقامِ درس</span></CardTitle>
               </div>
-              <Button size="sm" variant="outline" onClick={copyAddress} className="gap-1.5 text-xs">
-                {copied ? <Check className="size-3.5 text-green-600" /> : <Copy className="size-3.5" />}
-                {copied ? "Copied" : "Copy Address"}
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button size="sm" variant="gold" asChild className="gap-1.5 text-xs font-semibold shadow">
+                  <a href={SITE.address.mapsUrl} target="_blank" rel="noreferrer">
+                    <MapPin className="size-3.5" /> Open in Google Maps / نقشہ
+                  </a>
+                </Button>
+                <Button size="sm" variant="outline" onClick={copyAddress} className="gap-1.5 text-xs">
+                  {copied ? <Check className="size-3.5 text-green-600" /> : <Copy className="size-3.5" />}
+                  {copied ? "Copied" : "Copy Address"}
+                </Button>
+              </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-4 pt-4">

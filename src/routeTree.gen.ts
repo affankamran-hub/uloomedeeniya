@@ -22,6 +22,7 @@ import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as QuizRouteImport } from './routes/quiz'
 import { Route as ResourcesRouteImport } from './routes/resources'
+import { Route as ResultsRouteImport } from './routes/results'
 import { Route as TestsRouteImport } from './routes/tests'
 import { Route as SubjectKeyRouteImport } from './routes/subject.$key'
 
@@ -90,6 +91,11 @@ const ResourcesRoute = ResourcesRouteImport.update({
   path: '/resources',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResultsRoute = ResultsRouteImport.update({
+  id: '/results',
+  path: '/results',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TestsRoute = TestsRouteImport.update({
   id: '/tests',
   path: '/tests',
@@ -115,6 +121,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/quiz': typeof QuizRoute
   '/resources': typeof ResourcesRoute
+  '/results': typeof ResultsRoute
   '/tests': typeof TestsRoute
   '/subject/$key': typeof SubjectKeyRoute
 }
@@ -132,6 +139,7 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/quiz': typeof QuizRoute
   '/resources': typeof ResourcesRoute
+  '/results': typeof ResultsRoute
   '/tests': typeof TestsRoute
   '/subject/$key': typeof SubjectKeyRoute
 }
@@ -150,6 +158,7 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/quiz': typeof QuizRoute
   '/resources': typeof ResourcesRoute
+  '/results': typeof ResultsRoute
   '/tests': typeof TestsRoute
   '/subject/$key': typeof SubjectKeyRoute
 }
@@ -169,6 +178,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/quiz'
     | '/resources'
+    | '/results'
     | '/tests'
     | '/subject/$key'
   fileRoutesByTo: FileRoutesByTo
@@ -186,6 +196,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/quiz'
     | '/resources'
+    | '/results'
     | '/tests'
     | '/subject/$key'
   id:
@@ -203,6 +214,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/quiz'
     | '/resources'
+    | '/results'
     | '/tests'
     | '/subject/$key'
   fileRoutesById: FileRoutesById
@@ -221,6 +233,7 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRoute
   QuizRoute: typeof QuizRoute
   ResourcesRoute: typeof ResourcesRoute
+  ResultsRoute: typeof ResultsRoute
   TestsRoute: typeof TestsRoute
   SubjectKeyRoute: typeof SubjectKeyRoute
 }
@@ -318,6 +331,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResourcesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/results': {
+      id: '/results'
+      path: '/results'
+      fullPath: '/results'
+      preLoaderRoute: typeof ResultsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tests': {
       id: '/tests'
       path: '/tests'
@@ -349,6 +369,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRoute,
   QuizRoute: QuizRoute,
   ResourcesRoute: ResourcesRoute,
+  ResultsRoute: ResultsRoute,
   TestsRoute: TestsRoute,
   SubjectKeyRoute: SubjectKeyRoute,
 }

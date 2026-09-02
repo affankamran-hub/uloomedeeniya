@@ -5,6 +5,7 @@ export const SITE = {
   address: {
     en: "Rafa e Aam Society, Malir Halt, Karachi — near Masjid e Tauheed, Rafa e Aam",
     ur: "رفاہ عام سوسائٹی، ملیر ہالٹ، کراچی — مسجدِ توحید رفاہ عام کے قریب",
+    mapsUrl: "https://maps.app.goo.gl/MZoq5aQCAjxgFHwP6",
   },
   links: [
     { label: "www.emanekhalis.com", href: "https://www.emanekhalis.com" },

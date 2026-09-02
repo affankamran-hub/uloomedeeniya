@@ -112,6 +112,7 @@ function SubjectPage() {
           {GRADES.map((g) => {
             const forGrade = items.filter((i) => i.grade === g.n);
             const isTafheemGradeOne = key === "tafheem" && g.n === 1;
+            const isTajweedGradeOne = key === "tajweed" && g.n === 1;
 
             return (
               <TabsContent key={g.n} value={String(g.n)} className="mt-8 space-y-8">
@@ -150,9 +151,47 @@ function SubjectPage() {
                   </Card>
                 )}
 
+                {/* Official Syllabus Qaida for Grade 1 Tajweed ul Qur'an */}
+                {isTajweedGradeOne && (
+                  <Card className="card-soft border-gold/50 bg-gold/5 shadow-md">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between flex-wrap gap-2">
+                        <Badge variant="gold" className="font-semibold">
+                          Official Curriculum / بنیادی درسی قاعدہ
+                        </Badge>
+                        <span className="text-xs text-muted-foreground font-medium">Grade 1 • تجوید القرآن</span>
+                      </div>
+                      <CardTitle className="mt-2 text-xl font-bold">
+                        Darussalam Qurani Qaida — تجوید القرآن
+                      </CardTitle>
+                      <p className="urdu text-lg text-primary">دارالسلام قرآنی قاعدہ — تالیف: استاذ القراء قاری محمد ادریس العاصم</p>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <p className="text-sm text-muted-foreground">
+                        Official comprehensive Tajweed Qaida for Grade 1 students. Includes illustrated Makhaarij al-Huroof (مخارج الحروف), rules of Noon &amp; Meem Sakinah, Tanween, Maddat, Waqf principles, and complete Masnoon prayers.
+                      </p>
+                      <p className="urdu text-sm leading-loose text-muted-foreground">
+                        مخارج الحروف اور مختصر قواعد تجوید پر مشتمل پہلا باتصویر قاعدہ، مع مسنون نماز، اذکار اور قرآنی رموز اوقاف۔
+                      </p>
+                      <div className="flex flex-wrap items-center gap-3 pt-2">
+                        <Button asChild variant="gold" size="sm" className="font-semibold shadow">
+                          <a href="/tajweed-ul-quran-grade-1-qaida.pdf" target="_blank" rel="noreferrer" className="gap-1.5">
+                            <FileText className="size-4" /> Open Qurani Qaida PDF / قاعدہ کھولیں
+                          </a>
+                        </Button>
+                        <Button asChild variant="outline" size="sm">
+                          <a href="/tajweed-ul-quran-grade-1-qaida.pdf" download="darussalam-qurani-qaida-grade-1.pdf" className="gap-1.5">
+                            <Download className="size-4" /> Download PDF / ڈاؤنلوڈ
+                          </a>
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
                 {isLoading && <Skeleton className="h-32" />}
 
-                {!isLoading && forGrade.length === 0 && !isTafheemGradeOne && (
+                {!isLoading && forGrade.length === 0 && !isTafheemGradeOne && !isTajweedGradeOne && (
                   <div className="rounded-xl border border-dashed border-border p-10 text-center">
                     <p className="text-sm font-medium text-foreground">
                       No additional study material published for Grade {g.n} yet.

@@ -12,6 +12,7 @@ import {
   UserRound,
   ShieldCheck,
   Heart,
+  Award,
 } from "lucide-react";
 
 export type NavItem = {
@@ -24,11 +25,13 @@ export type NavItem = {
 export const PRIMARY_NAV: NavItem[] = [
   { to: "/", en: "Home", ur: "صفحۂ اول", icon: BookOpen },
   { to: "/grades", en: "Grades", ur: "درجات", icon: GraduationCap },
+  { to: "/results", en: "Results", ur: "نتائج", icon: Award },
   { to: "/resources", en: "Resources", ur: "مواد", icon: FileText },
   { to: "/events", en: "Events", ur: "پروگرام", icon: CalendarDays },
 ];
 
 export const SIDE_NAV: NavItem[] = [
+  { to: "/results", en: "Exam Results", ur: "امتحانی نتائج", icon: Award },
   { to: "/duas", en: "Masnoon Duas", ur: "دعائیں", icon: Heart },
   { to: "/quiz", en: "Quiz", ur: "کوئز", icon: ListOrdered },
   { to: "/tests", en: "Tests", ur: "امتحانات", icon: ClipboardList },
