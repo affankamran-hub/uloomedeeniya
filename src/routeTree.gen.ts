@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AssignmentsRouteImport } from './routes/assignments'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as DuasRouteImport } from './routes/duas'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as GradesRouteImport } from './routes/grades'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
@@ -42,6 +43,11 @@ const AssignmentsRoute = AssignmentsRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DuasRoute = DuasRouteImport.update({
+  id: '/duas',
+  path: '/duas',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EventsRoute = EventsRouteImport.update({
@@ -100,6 +106,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/assignments': typeof AssignmentsRoute
   '/auth': typeof AuthRoute
+  '/duas': typeof DuasRoute
   '/events': typeof EventsRoute
   '/grades': typeof GradesRoute
   '/leaderboard': typeof LeaderboardRoute
@@ -116,6 +123,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/assignments': typeof AssignmentsRoute
   '/auth': typeof AuthRoute
+  '/duas': typeof DuasRoute
   '/events': typeof EventsRoute
   '/grades': typeof GradesRoute
   '/leaderboard': typeof LeaderboardRoute
@@ -133,6 +141,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/assignments': typeof AssignmentsRoute
   '/auth': typeof AuthRoute
+  '/duas': typeof DuasRoute
   '/events': typeof EventsRoute
   '/grades': typeof GradesRoute
   '/leaderboard': typeof LeaderboardRoute
@@ -151,6 +160,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/assignments'
     | '/auth'
+    | '/duas'
     | '/events'
     | '/grades'
     | '/leaderboard'
@@ -167,6 +177,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/assignments'
     | '/auth'
+    | '/duas'
     | '/events'
     | '/grades'
     | '/leaderboard'
@@ -183,6 +194,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/assignments'
     | '/auth'
+    | '/duas'
     | '/events'
     | '/grades'
     | '/leaderboard'
@@ -200,6 +212,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   AssignmentsRoute: typeof AssignmentsRoute
   AuthRoute: typeof AuthRoute
+  DuasRoute: typeof DuasRoute
   EventsRoute: typeof EventsRoute
   GradesRoute: typeof GradesRoute
   LeaderboardRoute: typeof LeaderboardRoute
@@ -240,6 +253,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/duas': {
+      id: '/duas'
+      path: '/duas'
+      fullPath: '/duas'
+      preLoaderRoute: typeof DuasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/events': {
@@ -320,6 +340,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   AssignmentsRoute: AssignmentsRoute,
   AuthRoute: AuthRoute,
+  DuasRoute: DuasRoute,
   EventsRoute: EventsRoute,
   GradesRoute: GradesRoute,
   LeaderboardRoute: LeaderboardRoute,
@@ -334,3 +355,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

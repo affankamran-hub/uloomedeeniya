@@ -11,6 +11,7 @@ import {
   Trophy,
   UserRound,
   ShieldCheck,
+  Heart,
 } from "lucide-react";
 
 export type NavItem = {
@@ -28,6 +29,7 @@ export const PRIMARY_NAV: NavItem[] = [
 ];
 
 export const SIDE_NAV: NavItem[] = [
+  { to: "/duas", en: "Masnoon Duas", ur: "دعائیں", icon: Heart },
   { to: "/quiz", en: "Quiz", ur: "کوئز", icon: ListOrdered },
   { to: "/tests", en: "Tests", ur: "امتحانات", icon: ClipboardList },
   { to: "/assignments", en: "Assignments", ur: "مشقیں", icon: FileText },
