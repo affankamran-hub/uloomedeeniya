@@ -81,16 +81,39 @@ function AuthPage() {
   const google = async () => {
     setBusy(true);
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
+      const redirectUri = typeof window !== "undefined" ? `${window.location.origin}/auth` : undefined;
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/auth`,
+          redirectTo: redirectUri,
           queryParams: { prompt: "select_account" },
         },
       });
       if (error) {
-        toast.error(error.message || "Google sign-in failed. Please try again.");
+        if (
+          error.message?.toLowerCase().includes("unsupported provider") ||
+          error.message?.toLowerCase().includes("not enabled") ||
+          error.message?.toLowerCase().includes("provider is not enabled")
+        ) {
+          toast.error(
+            "Google sign-in requires enabling the Google provider in your Supabase dashboard (Authentication -> Providers -> Google). You can log in using Email & Password below!",
+            { duration: 7000 }
+          );
+        } else {
+          toast.error(error.message || "Google sign-in failed. Please try again.");
+        }
+        return;
       }
+      if (data?.url) {
+        window.location.assign(data.url);
+      }
+    } catch (err) {
+      console.error("Google auth error:", err);
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : "Google sign-in could not open. Please use Email & Password."
+      );
     } finally {
       setBusy(false);
     }

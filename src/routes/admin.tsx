@@ -2,7 +2,23 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Pencil, ShieldCheck, ShieldOff, Trash2, X } from "lucide-react";
+import {
+  Pencil,
+  ShieldCheck,
+  ShieldOff,
+  Trash2,
+  X,
+  Users,
+  FileSpreadsheet,
+  CheckCircle2,
+  Download,
+  Copy,
+  RefreshCw,
+  AlertCircle,
+  LayoutDashboard,
+  BookOpen,
+  Megaphone,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteLayout } from "@/components/SiteLayout";
 import { useAuth, type Profile } from "@/hooks/useAuth";
@@ -151,6 +167,44 @@ function MembersTabInner({ currentUserId }: { currentUserId: string }) {
     refresh();
   };
 
+  const approveAllPending = async () => {
+    const pendingIds = (data ?? []).filter((p) => !p.approved).map((p) => p.id);
+    if (pendingIds.length === 0) {
+      toast.info("No pending requests to approve.");
+      return;
+    }
+    if (!window.confirm(`Approve all ${pendingIds.length} pending students at once?`)) return;
+    const { error } = await supabase.from("profiles").update({ approved: true }).in("id", pendingIds);
+    if (error) { toast.error(error.message); return; }
+    toast.success(`Approved all ${pendingIds.length} students! / تمام طلبہ کو منظوری مل گئی`);
+    refresh();
+  };
+
+  const exportMembers = () => {
+    if (!data || data.length === 0) {
+      toast.info("No members to export.");
+      return;
+    }
+    const headers = ["Full Name", "Email", "Phone", "Grade", "Status", "Role", "Registered At"];
+    const rows = data.map((p) => [
+      `"${p.full_name || ''}"`,
+      `"${p.email || ''}"`,
+      `"${p.phone || ''}"`,
+      `"${p.requested_grade ? 'Grade ' + p.requested_grade : 'None'}"`,
+      `"${p.approved ? 'Approved' : 'Pending'}"`,
+      `"${p.isAdmin ? 'Admin' : 'Student'}"`,
+      `"${new Date(p.created_at).toLocaleDateString()}"`,
+    ]);
+    const csvContent = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `uloomedeeniya-students-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    toast.success("Student records exported to CSV! / ریکارڈ ڈاؤنلوڈ ہو گیا");
+  };
+
   if (isLoading) return <p className="text-sm text-muted-foreground">Loading…</p>;
 
   const term = search.trim().toLowerCase();
@@ -168,24 +222,37 @@ function MembersTabInner({ currentUserId }: { currentUserId: string }) {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-3">
-        <Input
-          placeholder="Search name, email or phone…"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="max-w-xs"
-        />
-        <Select value={filter} onValueChange={(v) => setFilter(v as typeof filter)}>
-          <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All members</SelectItem>
-            <SelectItem value="pending">Pending approval</SelectItem>
-            <SelectItem value="approved">Approved</SelectItem>
-          </SelectContent>
-        </Select>
-        <Badge variant={pendingCount ? "default" : "secondary"}>
-          {pendingCount} awaiting approval / زیرِ غور
-        </Badge>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <Input
+            placeholder="Search name, email or phone…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="max-w-xs"
+          />
+          <Select value={filter} onValueChange={(v) => setFilter(v as typeof filter)}>
+            <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All members ({data?.length ?? 0})</SelectItem>
+              <SelectItem value="pending">Pending ({pendingCount})</SelectItem>
+              <SelectItem value="approved">Approved ({(data?.length ?? 0) - pendingCount})</SelectItem>
+            </SelectContent>
+          </Select>
+          <Badge variant={pendingCount ? "default" : "secondary"}>
+            {pendingCount} awaiting approval / زیرِ غور
+          </Badge>
+        </div>
+
+        <div className="flex items-center gap-2">
+          {pendingCount > 0 && (
+            <Button size="sm" variant="gold" onClick={approveAllPending} className="gap-1.5 font-semibold">
+              <CheckCircle2 className="size-4" /> Approve All ({pendingCount})
+            </Button>
+          )}
+          <Button size="sm" variant="outline" onClick={exportMembers} className="gap-1.5">
+            <Download className="size-4" /> Export CSV / ڈاؤنلوڈ
+          </Button>
+        </div>
       </div>
 
       {list.map((p) => (
@@ -501,8 +568,84 @@ function ContentTab() {
   );
 }
 
+function AdminOverviewKPIs() {
+  const { data: profiles } = useQuery({
+    queryKey: ["profiles-kpi"],
+    queryFn: async () => {
+      const { data } = await supabase.from("profiles").select("id, approved");
+      return data ?? [];
+    },
+  });
+
+  const { data: content } = useQuery({
+    queryKey: ["content-kpi"],
+    queryFn: async () => {
+      const { data } = await supabase.from("content").select("id");
+      return data ?? [];
+    },
+  });
+
+  const { data: announcements } = useQuery({
+    queryKey: ["announcements-kpi"],
+    queryFn: async () => {
+      const { data } = await supabase.from("announcements").select("id");
+      return data ?? [];
+    },
+  });
+
+  const { data: quizzes } = useQuery({
+    queryKey: ["quizzes-kpi"],
+    queryFn: async () => {
+      const { data } = await supabase.from("quizzes").select("id");
+      return data ?? [];
+    },
+  });
+
+  const totalMembers = profiles?.length ?? 0;
+  const pendingMembers = profiles?.filter((p) => !p.approved).length ?? 0;
+  const totalContent = content?.length ?? 0;
+  const totalAnnouncements = announcements?.length ?? 0;
+  const totalQuizzes = quizzes?.length ?? 0;
+
+  const cards = [
+    { label: "Total Students", labelUr: "کل طلبہ", value: totalMembers, icon: Users, color: "text-blue-500" },
+    {
+      label: "Pending Approvals",
+      labelUr: "زیرِ غور داخلے",
+      value: pendingMembers,
+      icon: AlertCircle,
+      color: pendingMembers > 0 ? "text-amber-500 font-bold" : "text-green-500",
+      alert: pendingMembers > 0,
+    },
+    { label: "Study Materials", labelUr: "کتب و درسی مواد", value: totalContent, icon: BookOpen, color: "text-emerald-500" },
+    { label: "Announcements", labelUr: "اطلاعات", value: totalAnnouncements, icon: Megaphone, color: "text-purple-500" },
+    { label: "Quizzes & Tests", labelUr: "امتحانات و کوئز", value: totalQuizzes, icon: LayoutDashboard, color: "text-gold" },
+  ];
+
+  return (
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+      {cards.map((c) => {
+        const Icon = c.icon;
+        return (
+          <Card key={c.label} className={`card-soft overflow-hidden ${c.alert ? "border-amber-500/50 bg-amber-500/5" : ""}`}>
+            <CardContent className="p-4 space-y-1">
+              <div className="flex items-center justify-between text-muted-foreground text-xs">
+                <span>{c.label}</span>
+                <Icon className={`size-4 ${c.color}`} />
+              </div>
+              <p className="text-2xl font-bold text-foreground">{c.value}</p>
+              <p className="urdu text-xs text-muted-foreground">{c.labelUr}</p>
+            </CardContent>
+          </Card>
+        );
+      })}
+    </div>
+  );
+}
+
 function AdminPage() {
   const { loading, user, isAdmin } = useAuth();
+  const [copiedSql, setCopiedSql] = useState(false);
 
   if (loading) {
     return (
@@ -512,18 +655,89 @@ function AdminPage() {
     );
   }
 
-  if (!user || !isAdmin) {
+  if (!user) {
     return (
       <SiteLayout>
         <div className="mx-auto max-w-xl px-4 py-16">
-          <Card className="card-soft">
+          <Card className="card-soft text-center p-6 space-y-4">
             <CardHeader>
-              <CardTitle>Administrators only</CardTitle>
-              <p className="urdu text-lg text-primary">صرف منتظمین کے لیے</p>
+              <CardTitle className="text-2xl font-bold">Sign In Required</CardTitle>
+              <p className="urdu text-lg text-primary">پہلے لاگ ان کیجیے</p>
             </CardHeader>
             <CardContent className="space-y-3 text-sm text-muted-foreground">
-              <p>This section manages members and study material of the institute.</p>
-              <Button asChild><Link to="/auth">Sign in</Link></Button>
+              <p>Please sign in with your authorized administrator email to access this panel.</p>
+              <Button asChild variant="gold" className="w-full font-semibold">
+                <Link to="/auth">Go to Sign In / داخلہ کیجیے</Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </SiteLayout>
+    );
+  }
+
+  if (!isAdmin) {
+    const grantAdminSql = `INSERT INTO user_roles (user_id, role) VALUES ('${user.id}', 'admin') ON CONFLICT DO NOTHING;`;
+
+    const copySql = () => {
+      navigator.clipboard.writeText(grantAdminSql);
+      setCopiedSql(true);
+      toast.success("SQL command copied to clipboard!");
+      setTimeout(() => setCopiedSql(false), 2000);
+    };
+
+    return (
+      <SiteLayout>
+        <div className="mx-auto max-w-2xl px-4 py-16">
+          <Card className="card-soft border-amber-500/40 shadow-lg">
+            <CardHeader className="bg-amber-500/10 border-b border-border/60 pb-4">
+              <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
+                <ShieldCheck className="size-6" />
+                <CardTitle className="text-xl font-bold">Administrator Access Required</CardTitle>
+              </div>
+              <p className="urdu text-base text-primary">صرف مجاز منتظمین کے لیے</p>
+            </CardHeader>
+            <CardContent className="space-y-4 pt-5 text-sm text-muted-foreground">
+              <p>
+                You are currently signed in as <strong className="text-foreground">{user.email}</strong>, but this account has not been assigned the <code className="bg-muted px-1.5 py-0.5 rounded text-foreground font-mono">admin</code> role in the database yet.
+              </p>
+
+              <div className="rounded-lg border border-border bg-muted/40 p-4 space-y-2">
+                <div className="flex items-center justify-between text-xs text-foreground font-semibold">
+                  <span>Your Supabase User ID:</span>
+                  <span className="font-mono text-muted-foreground">{user.id}</span>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  If you are the institute owner, open your <strong>Supabase Dashboard → SQL Editor</strong> and run this command:
+                </p>
+                <div className="relative">
+                  <pre className="p-3 rounded bg-background border border-border text-xs font-mono overflow-x-auto text-foreground">
+                    {grantAdminSql}
+                  </pre>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={copySql}
+                    className="absolute top-2 end-2 h-7 text-xs gap-1"
+                  >
+                    {copiedSql ? <CheckCircle2 className="size-3.5 text-green-600" /> : <Copy className="size-3.5" />}
+                    {copiedSql ? "Copied" : "Copy SQL"}
+                  </Button>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-3 pt-2">
+                <Button
+                  onClick={() => window.location.reload()}
+                  className="gap-1.5"
+                  variant="default"
+                >
+                  <RefreshCw className="size-4" /> Check &amp; Refresh Access / تصدیق کریں
+                </Button>
+                <Button asChild variant="outline">
+                  <Link to="/">Back to Home / صفحۂ اول</Link>
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -533,24 +747,53 @@ function AdminPage() {
 
   return (
     <SiteLayout>
-      <div className="mx-auto max-w-6xl px-4 py-12">
-        <h1 className="text-3xl">Administration</h1>
-        <p className="urdu text-xl text-primary">انتظامیہ</p>
+      <div className="mx-auto max-w-6xl px-4 py-12 space-y-8">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold">Administration Control Center</h1>
+            <p className="urdu text-2xl text-primary font-medium">مرکزی انتظامی پینل — علوم دینیہ</p>
+          </div>
+          <Badge variant="outline" className="gap-1.5 px-3 py-1 text-xs border-gold text-gold">
+            <ShieldCheck className="size-4" /> Logged in as Administrator
+          </Badge>
+        </div>
+
+        {/* Executive KPI Overview Bar */}
+        <AdminOverviewKPIs />
+
         <Tabs defaultValue="members" className="mt-8">
-          <TabsList>
-            <TabsTrigger value="members">Members</TabsTrigger>
-            <TabsTrigger value="content">Content</TabsTrigger>
-            <TabsTrigger value="updates">Updates</TabsTrigger>
-            <TabsTrigger value="quizzes">Quizzes</TabsTrigger>
-            <TabsTrigger value="activity">Activity</TabsTrigger>
+          <TabsList className="flex h-auto flex-wrap gap-1 border-b border-border pb-2">
+            <TabsTrigger value="members" className="gap-1.5">
+              <Users className="size-4" /> Members / طلبہ
+            </TabsTrigger>
+            <TabsTrigger value="content" className="gap-1.5">
+              <BookOpen className="size-4" /> Study Content / مواد
+            </TabsTrigger>
+            <TabsTrigger value="updates" className="gap-1.5">
+              <Megaphone className="size-4" /> Announcements / اطلاعات
+            </TabsTrigger>
+            <TabsTrigger value="quizzes" className="gap-1.5">
+              <LayoutDashboard className="size-4" /> Quizzes &amp; Tests / کوئز
+            </TabsTrigger>
+            <TabsTrigger value="activity" className="gap-1.5">
+              <RefreshCw className="size-4" /> Audit Activity / سرگرمیاں
+            </TabsTrigger>
           </TabsList>
           <TabsContent value="members" className="mt-6">
             <MembersTab currentUserId={user.id} />
           </TabsContent>
-          <TabsContent value="content" className="mt-6"><ContentTab /></TabsContent>
-          <TabsContent value="updates" className="mt-6"><UpdatesTab /></TabsContent>
-          <TabsContent value="quizzes" className="mt-6"><QuizzesTab /></TabsContent>
-          <TabsContent value="activity" className="mt-6"><ActivityTab /></TabsContent>
+          <TabsContent value="content" className="mt-6">
+            <ContentTab />
+          </TabsContent>
+          <TabsContent value="updates" className="mt-6">
+            <UpdatesTab />
+          </TabsContent>
+          <TabsContent value="quizzes" className="mt-6">
+            <QuizzesTab />
+          </TabsContent>
+          <TabsContent value="activity" className="mt-6">
+            <ActivityTab />
+          </TabsContent>
         </Tabs>
       </div>
     </SiteLayout>
