@@ -14,6 +14,7 @@ import {
   ArrowRight,
   Compass,
   FileText,
+  Trophy,
 } from "lucide-react";
 import { toast } from "sonner";
 import logo from "@/assets/logo.jpeg.asset.json";
@@ -309,6 +310,38 @@ function Home() {
                 </div>
               </a>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Special Competition & Owner Treat Banner */}
+      <section className="mx-auto max-w-6xl px-4 pb-14">
+        <div className="overflow-hidden rounded-2xl border-2 border-gold bg-gradient-to-br from-gold/20 via-amber-500/10 to-primary/10 p-6 md:p-8 shadow-xl ring-1 ring-gold/40">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-6 text-center lg:text-left">
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <div className="flex size-16 shrink-0 items-center justify-center rounded-2xl bg-gold text-slate-950 shadow-md">
+                <Trophy className="size-8" />
+              </div>
+              <div className="space-y-1.5">
+                <Badge className="bg-gold text-slate-950 font-black text-xs uppercase tracking-wider">
+                  🏆 Special Reward / خصوصی انعام
+                </Badge>
+                <h3 className="text-xl md:text-2xl font-black text-foreground tracking-tight">
+                  “Whoever remains at the top of the leaderboard will win a treat from the owner of the website!”
+                </h3>
+                <p className="urdu text-xl md:text-2xl font-bold text-primary leading-relaxed">
+                  ”جو طالبِ علم لیڈر بورڈ میں سب سے اوپر (پہلی پوزیشن پر) رہے گا، اسے ویب سائٹ کے مالک کی جانب سے خصوصی دعوت (Treat) دی جائے گی!“
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center justify-center gap-3 shrink-0">
+              <Button asChild variant="gold" size="lg" className="font-bold shadow-md">
+                <Link to="/leaderboard">Leaderboard / لیڈر بورڈ →</Link>
+              </Button>
+              <Button asChild variant="outline" size="lg">
+                <Link to="/quiz">Attempt Quiz / کوئز دیں</Link>
+              </Button>
+            </div>
           </div>
         </div>
       </section>

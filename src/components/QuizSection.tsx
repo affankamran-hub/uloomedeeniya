@@ -7,6 +7,7 @@ import { GRADES, subjectName } from "@/lib/site";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Gift, Trophy } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -176,9 +177,34 @@ export function QuizList({
 
   return (
     <div>
-      <h1 className="text-3xl">{titleEn}</h1>
-      <p className="urdu text-xl text-primary">{titleUr}</p>
+      <h1 className="text-3xl font-bold">{titleEn}</h1>
+      <p className="urdu text-xl text-primary font-medium">{titleUr}</p>
       <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{intro}</p>
+
+      {/* Special Owner Surprise Treat Incentive */}
+      <div className="mt-6 rounded-2xl border-2 border-gold bg-gradient-to-r from-gold/20 via-amber-500/15 to-primary/10 p-4 md:p-5 shadow-md">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-gold text-slate-950 shadow">
+              <Gift className="size-6 animate-bounce" />
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-wider font-bold text-slate-950 dark:text-gold">
+                🏆 Leaderboard Challenge / خصوصی انعام
+              </p>
+              <p className="text-sm font-bold text-foreground">
+                “Whoever remains at the top of the leaderboard will win a surprise treat from the owner of the website!”
+              </p>
+              <p className="urdu text-sm font-bold text-primary">
+                ”جو طالبِ علم ویب سائٹ کے لیڈر بورڈ میں پہلی پوزیشن پر رہے گا، اسے ویب سائٹ کے مالک کی جانب سے سرپرائز دعوت (Surprise Treat) دی جائے گی!“
+              </p>
+            </div>
+          </div>
+          <Button asChild size="sm" variant="gold" className="shrink-0 font-bold shadow text-xs">
+            <Link to="/leaderboard">Leaderboard →</Link>
+          </Button>
+        </div>
+      </div>
 
       <div className="mt-8 grid gap-4 md:grid-cols-2">
         {isLoading && <p className="text-sm text-muted-foreground">Loading…</p>}

@@ -18,6 +18,8 @@ import {
   LayoutDashboard,
   BookOpen,
   Megaphone,
+  Upload,
+  FileText,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteLayout } from "@/components/SiteLayout";
@@ -504,24 +506,56 @@ function ContentTab() {
             </div>
             {form.category !== "event" && (
               <div className="space-y-2">
-                <Label>Or upload a PDF for this grade &amp; subject</Label>
-                <Input
-                  type="file"
-                  accept="application/pdf,.pdf,.doc,.docx,image/*"
-                  disabled={uploading}
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) void uploadFile(file);
-                    e.target.value = "";
-                  }}
-                />
-                <p className="text-xs text-muted-foreground">
-                  {uploading
-                    ? "Uploading…"
-                    : isStorageUrl(form.url)
-                      ? `Attached: ${storagePath(form.url)}`
-                      : "Uploaded files are visible to approved students only."}
-                </p>
+                <Label>Upload PDF / Document / Image</Label>
+                <label
+                  className={`flex cursor-pointer flex-col items-center gap-3 rounded-xl border-2 border-dashed p-5 text-center transition-colors ${
+                    uploading
+                      ? "border-primary/40 bg-primary/5"
+                      : isStorageUrl(form.url)
+                        ? "border-green-500/50 bg-green-500/5"
+                        : "border-border hover:border-primary/50 hover:bg-muted/30"
+                  }`}
+                >
+                  <input
+                    type="file"
+                    accept="application/pdf,.pdf,.doc,.docx,image/*"
+                    className="sr-only"
+                    disabled={uploading}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) void uploadFile(file);
+                      e.target.value = "";
+                    }}
+                  />
+                  {uploading ? (
+                    <>
+                      <div className="size-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+                      <p className="text-sm font-medium text-primary">Uploading to Supabase Storage…</p>
+                    </>
+                  ) : isStorageUrl(form.url) ? (
+                    <>
+                      <FileText className="size-8 text-green-600" />
+                      <p className="text-sm font-semibold text-green-700 dark:text-green-400">File attached ✓</p>
+                      <p className="break-all text-xs text-muted-foreground">{storagePath(form.url)}</p>
+                      <p className="text-xs text-muted-foreground">Click to replace</p>
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="size-8 text-muted-foreground" />
+                      <p className="text-sm font-medium text-foreground">Click to upload PDF, Word doc, or image</p>
+                      <p className="text-xs text-muted-foreground">Accessible to approved students only · Max 50 MB</p>
+                    </>
+                  )}
+                </label>
+                {isStorageUrl(form.url) && (
+                  <button
+                    type="button"
+                    className="text-xs text-destructive underline-offset-4 hover:underline"
+                    onClick={() => setForm((f) => ({ ...f, url: "" }))}
+                  >
+                    Remove attachment
+                  </button>
+                )}
               </div>
             )}
             {form.category === "event" && (

@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Trophy } from "lucide-react";
+import { Trophy, Gift, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteLayout } from "@/components/SiteLayout";
 import { useAuth } from "@/hooks/useAuth";
@@ -76,13 +76,38 @@ function LeaderboardPage() {
   return (
     <SiteLayout>
       <div className="mx-auto max-w-4xl px-4 py-12">
-        <h1 className="flex items-center gap-3 text-3xl">
-          <Trophy className="size-7 text-gold" /> Leaderboard
+        <h1 className="flex items-center gap-3 text-3xl font-bold">
+          <Trophy className="size-8 text-gold" /> Leaderboard / لیڈر بورڈ
         </h1>
-        <p className="urdu text-xl text-primary">نتائج کی فہرست</p>
+        <p className="urdu text-xl text-primary mt-1">امتحانی و تعلیمی پوائنٹس کی درجہ بندی</p>
         <p className="mt-2 text-sm text-muted-foreground">
-          Points from quizzes, tests and assignments answered on the website.
+          Points accumulated from active quizzes, tests, and homework assignments answered by students.
         </p>
+
+        {/* Special Owner Treat Announcement Banner */}
+        <div className="mt-6 overflow-hidden rounded-2xl border-2 border-gold bg-gradient-to-br from-gold/25 via-amber-500/15 to-primary/10 p-6 shadow-xl ring-2 ring-gold/40 backdrop-blur-md">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-5 text-center md:text-left">
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <div className="flex size-16 shrink-0 items-center justify-center rounded-2xl bg-gold text-slate-950 shadow-lg">
+                <Gift className="size-8 animate-bounce" />
+              </div>
+              <div className="space-y-1.5">
+                <div className="inline-flex items-center gap-1.5 rounded-full bg-gold/30 px-3.5 py-0.5 text-xs font-black text-slate-950 dark:text-gold uppercase tracking-wider">
+                  <Sparkles className="size-3.5" /> Special Prize Announcement / خصوصی انعام
+                </div>
+                <h2 className="text-xl md:text-2xl font-black text-foreground tracking-tight">
+                  “Whoever remains at the top of the leaderboard will win a treat from the owner of the website!”
+                </h2>
+                <p className="urdu text-xl md:text-2xl font-bold text-primary leading-relaxed">
+                  ”جو طالبِ علم لیڈر بورڈ میں سب سے اوپر (پہلی پوزیشن پر) رہے گا، اسے ویب سائٹ کے مالک کی جانب سے خصوصی دعوت (Treat) دی جائے گی!“
+                </p>
+              </div>
+            </div>
+            <Badge className="shrink-0 bg-gold px-4 py-2.5 text-xs md:text-sm font-black text-slate-950 shadow-md">
+              🏆 #1 Champion Treat
+            </Badge>
+          </div>
+        </div>
 
         {!user ? (
           <div className="mt-8">

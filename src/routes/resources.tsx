@@ -41,30 +41,34 @@ function ResourcesPage() {
         </div>
 
         {/* Featured Core Coursebooks */}
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {/* Tajweed ul Quran Grade 1 Qaida */}
-          <Card className="card-soft border-gold/40 bg-card shadow-sm">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between flex-wrap gap-2">
-                <Badge variant="gold" className="font-semibold">Grade 1 • تجوید القرآن</Badge>
-                <span className="text-xs text-muted-foreground font-mono">PDF (5.7 MB)</span>
-              </div>
-              <CardTitle className="text-xl font-bold mt-2">Darussalam Qurani Qaida</CardTitle>
-              <p className="urdu text-lg text-primary">دارالسلام قرآنی قاعدہ — باتصویر قواعد تجوید</p>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                Official illustrated Tajweed Qaida by Qari Muhammad Idris al-Asim. Complete rules of Makhaarij, Tanween, Noon &amp; Meem Sakinah, and Masnoon prayers.
-              </p>
-              <div className="flex flex-wrap items-center gap-2.5 pt-2">
-                <Button asChild variant="gold" size="sm" className="font-semibold">
+          <Card className="card-soft border-gold/40 bg-card shadow-sm flex flex-col justify-between">
+            <div>
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <Badge variant="gold" className="font-semibold">Grade 1 • تجوید القرآن</Badge>
+                  <span className="text-xs text-muted-foreground font-mono">PDF (5.7 MB)</span>
+                </div>
+                <CardTitle className="text-lg font-bold mt-2">Darussalam Qurani Qaida</CardTitle>
+                <p className="urdu text-base text-primary">دارالسلام قرآنی قاعدہ — باتصویر قواعد تجوید</p>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Official illustrated Tajweed Qaida by Qari Muhammad Idris al-Asim. Covers Makhaarij, Tanween, Noon &amp; Meem Sakinah, and Masnoon prayers.
+                </p>
+              </CardContent>
+            </div>
+            <CardContent className="pt-0">
+              <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border/60">
+                <Button asChild variant="gold" size="sm" className="font-semibold text-xs h-8">
                   <a href="/tajweed-ul-quran-grade-1-qaida.pdf" target="_blank" rel="noreferrer" className="gap-1.5">
-                    <FileText className="size-4" /> Open Qaida / کھولیں
+                    <FileText className="size-3.5" /> Open / کھولیں
                   </a>
                 </Button>
-                <Button asChild variant="outline" size="sm">
+                <Button asChild variant="outline" size="sm" className="text-xs h-8">
                   <a href="/tajweed-ul-quran-grade-1-qaida.pdf" download="darussalam-qurani-qaida-grade-1.pdf" className="gap-1.5">
-                    <Download className="size-4" /> Download PDF
+                    <Download className="size-3.5" /> Download
                   </a>
                 </Button>
               </div>
@@ -72,28 +76,65 @@ function ResourcesPage() {
           </Card>
 
           {/* Tafheem ud Din Grade 1 Coursebook */}
-          <Card className="card-soft border-primary/40 bg-card shadow-sm">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between flex-wrap gap-2">
-                <Badge variant="default" className="bg-primary text-primary-foreground">Grade 1 • تفہیم الدین</Badge>
-                <span className="text-xs text-muted-foreground font-mono">PDF (2.4 MB)</span>
-              </div>
-              <CardTitle className="text-xl font-bold mt-2">Tafheem ud Din — Coursebook</CardTitle>
-              <p className="urdu text-lg text-primary">تفہیم الدین — درجہ اولیٰ مکمل نصابی کتاب</p>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                Official course manual published for Grade 1 students of Ma'had al-Uloom (Tauheed Trust). Foundations of Islamic belief, understanding, and daily practice.
-              </p>
-              <div className="flex flex-wrap items-center gap-2.5 pt-2">
-                <Button asChild variant="gold" size="sm" className="font-semibold">
+          <Card className="card-soft border-primary/40 bg-card shadow-sm flex flex-col justify-between">
+            <div>
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <Badge variant="default" className="bg-primary text-primary-foreground">Grade 1 • تفہیم الدین</Badge>
+                  <span className="text-xs text-muted-foreground font-mono">PDF (2.4 MB)</span>
+                </div>
+                <CardTitle className="text-lg font-bold mt-2">Tafheem ud Din Coursebook</CardTitle>
+                <p className="urdu text-base text-primary">تفہیم الدین — درجہ اولیٰ درسی کتاب</p>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Official course manual for Grade 1 students of Ma'had al-Uloom (Tauheed Trust). Foundations of Islamic belief, understanding, and daily practice.
+                </p>
+              </CardContent>
+            </div>
+            <CardContent className="pt-0">
+              <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border/60">
+                <Button asChild variant="gold" size="sm" className="font-semibold text-xs h-8">
                   <a href={tafheemPdf.url} target="_blank" rel="noreferrer" className="gap-1.5">
-                    <FileText className="size-4" /> Open Coursebook / کھولیں
+                    <FileText className="size-3.5" /> Open / کھولیں
                   </a>
                 </Button>
-                <Button asChild variant="outline" size="sm">
+                <Button asChild variant="outline" size="sm" className="text-xs h-8">
                   <a href={tafheemPdf.url} download="tafheem-ud-din-grade-1.pdf" className="gap-1.5">
-                    <Download className="size-4" /> Download PDF
+                    <Download className="size-3.5" /> Download
+                  </a>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Usool e Hadith Grade 1 Coursebook */}
+          <Card className="card-soft border-emerald-500/40 bg-card shadow-sm flex flex-col justify-between">
+            <div>
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <Badge variant="default" className="bg-emerald-600 text-white font-semibold">Grade 1 • اصول حدیث</Badge>
+                  <span className="text-xs text-muted-foreground font-mono">PDF (8.0 MB)</span>
+                </div>
+                <CardTitle className="text-lg font-bold mt-2">Usool e Hadith Coursebook</CardTitle>
+                <p className="urdu text-base text-primary">اصول حدیث — الدرجة الأولی نصابی کتاب</p>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Complete manual of Hadith Sciences for Grade 1: Sanad &amp; Matn, Mutawatir &amp; Wahid, Sahih, Hasan, Dhaeef, Inqita', and Jarh wat-Ta'deel.
+                </p>
+              </CardContent>
+            </div>
+            <CardContent className="pt-0">
+              <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border/60">
+                <Button asChild variant="gold" size="sm" className="font-semibold text-xs h-8">
+                  <a href="/usool-e-hadith-grade-1.pdf" target="_blank" rel="noreferrer" className="gap-1.5">
+                    <FileText className="size-3.5" /> Open / کھولیں
+                  </a>
+                </Button>
+                <Button asChild variant="outline" size="sm" className="text-xs h-8">
+                  <a href="/usool-e-hadith-grade-1.pdf" download="usool-e-hadith-grade-1.pdf" className="gap-1.5">
+                    <Download className="size-3.5" /> Download
                   </a>
                 </Button>
               </div>

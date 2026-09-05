@@ -96,7 +96,7 @@ const RESULTS_DATA: StudentResult[] = [
   { rollNo: 23, name: "اسحان زبیر", fatherName: "زبیر", area: "رفاہ عام", hadith: 13, tajweed: 10, tafheem: 16, lughah: 37, tarjuma: 7, total: 83.0, percentage: 33.2, grade: "راسب", failedSubjects: ["ترجمہ", "دروس اللغۃ", "تفہیم", "حدیث"] },
   { rollNo: 24, name: "عارف بیگ", fatherName: "عبدالعظیم بیگ", area: "رفاہ عام", hadith: 37, tajweed: 30, tafheem: 34.5, lughah: 42, tarjuma: 25, total: 168.5, percentage: 67.4, grade: "مقبول" },
   { rollNo: 25, name: "عبدالرحمٰن بیگ", fatherName: "عارف بیگ", area: "رفاہ عام", hadith: 23, tajweed: 22, tafheem: 22.5, lughah: 39, tarjuma: 21, total: 127.5, percentage: 51.0, grade: "ضعیف" },
-  { rollNo: 26, name: "اتمامیہ خالد", fatherName: "خالد عزت", area: "رفاہ عام", hadith: 41, tajweed: 44, tafheem: 47, lughah: 50, tarjuma: 50, total: 232.0, percentage: 92.8, grade: "ممتاز" },
+  { rollNo: 26, name: "ابراہیم خالد", fatherName: "خالد عزیز", area: "رفاہ عام", hadith: 41, tajweed: 44, tafheem: 47, lughah: 50, tarjuma: 50, total: 232.0, percentage: 92.8, grade: "ممتاز" },
   { rollNo: 27, name: "عمار عاصم", fatherName: "عاصم احسان", area: "رفاہ عام", hadith: 17, tajweed: 28, tafheem: 31.5, lughah: 31, tarjuma: 15, total: 122.5, percentage: 49.0, grade: "راسب", failedSubjects: ["ترجمہ", "حدیث"] },
 ];
 

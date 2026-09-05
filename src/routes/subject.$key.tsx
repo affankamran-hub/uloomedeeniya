@@ -113,6 +113,7 @@ function SubjectPage() {
             const forGrade = items.filter((i) => i.grade === g.n);
             const isTafheemGradeOne = key === "tafheem" && g.n === 1;
             const isTajweedGradeOne = key === "tajweed" && g.n === 1;
+            const isHadithGradeOne = key === "hadith" && g.n === 1;
 
             return (
               <TabsContent key={g.n} value={String(g.n)} className="mt-8 space-y-8">
@@ -189,9 +190,47 @@ function SubjectPage() {
                   </Card>
                 )}
 
+                {/* Official Syllabus Book for Grade 1 Usool e Hadith */}
+                {isHadithGradeOne && (
+                  <Card className="card-soft border-emerald-500/40 bg-emerald-500/5 shadow-md">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between flex-wrap gap-2">
+                        <Badge variant="default" className="bg-emerald-600 text-white font-semibold">
+                          Official Coursebook / بنیادی نصابی کتاب
+                        </Badge>
+                        <span className="text-xs text-muted-foreground font-medium">Grade 1 • اصول حدیث</span>
+                      </div>
+                      <CardTitle className="mt-2 text-xl font-bold">
+                        Usool e Hadith — Grade 1 (الدرجة الأولی)
+                      </CardTitle>
+                      <p className="urdu text-lg text-primary">اصول حدیث — دورۃ العلوم الدینیۃ، معھد العلوم الاسلامیۃ باکستان</p>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <p className="text-sm text-muted-foreground">
+                        Official comprehensive textbook for Grade 1 Usool e Hadith. Covers foundational rules of Hadith sciences, Sanad &amp; Matn, Khabar Mutawatir &amp; Wahid, Hadith Sahih, Hasan, Dhaeef, Inqita', and Ilm al-Jarh wat-Ta'deel.
+                      </p>
+                      <p className="urdu text-sm leading-loose text-muted-foreground">
+                        علوم الحدیث میں استعمال ہونے والی اصطلاحات کی تعریف، راویوں کے متعلق معلومات، تخریج و تطبیق الحدیث اور محدثین کرام کی کاوشیں۔
+                      </p>
+                      <div className="flex flex-wrap items-center gap-3 pt-2">
+                        <Button asChild variant="gold" size="sm" className="font-semibold shadow">
+                          <a href="/usool-e-hadith-grade-1.pdf" target="_blank" rel="noreferrer" className="gap-1.5">
+                            <FileText className="size-4" /> Open Coursebook PDF / کتاب کھولیں
+                          </a>
+                        </Button>
+                        <Button asChild variant="outline" size="sm">
+                          <a href="/usool-e-hadith-grade-1.pdf" download="usool-e-hadith-grade-1.pdf" className="gap-1.5">
+                            <Download className="size-4" /> Download PDF / ڈاؤنلوڈ
+                          </a>
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
                 {isLoading && <Skeleton className="h-32" />}
 
-                {!isLoading && forGrade.length === 0 && !isTafheemGradeOne && !isTajweedGradeOne && (
+                {!isLoading && forGrade.length === 0 && !isTafheemGradeOne && !isTajweedGradeOne && !isHadithGradeOne && (
                   <div className="rounded-xl border border-dashed border-border p-10 text-center">
                     <p className="text-sm font-medium text-foreground">
                       No additional study material published for Grade {g.n} yet.
