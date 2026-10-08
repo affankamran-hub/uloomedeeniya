@@ -506,7 +506,7 @@ function ContentTab() {
             </div>
             {form.category !== "event" && (
               <div className="space-y-2">
-                <Label>Upload PDF / Document / Image</Label>
+                <Label>{form.category === "lecture" ? "Upload Lecture Video (MP4/WebM) or PDF" : "Upload PDF / Document / Image / Video"}</Label>
                 <label
                   className={`flex cursor-pointer flex-col items-center gap-3 rounded-xl border-2 border-dashed p-5 text-center transition-colors ${
                     uploading
@@ -518,7 +518,7 @@ function ContentTab() {
                 >
                   <input
                     type="file"
-                    accept="application/pdf,.pdf,.doc,.docx,image/*"
+                    accept={form.category === "lecture" ? "video/*,.mp4,.webm,.mov,.mkv,application/pdf,.pdf" : "application/pdf,.pdf,.doc,.docx,image/*,video/*"}
                     className="sr-only"
                     disabled={uploading}
                     onChange={(e) => {
@@ -530,7 +530,7 @@ function ContentTab() {
                   {uploading ? (
                     <>
                       <div className="size-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-                      <p className="text-sm font-medium text-primary">Uploading to Supabase Storage…</p>
+                      <p className="text-sm font-medium text-primary">Uploading… large videos may take a few minutes</p>
                     </>
                   ) : isStorageUrl(form.url) ? (
                     <>
