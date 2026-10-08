@@ -207,6 +207,7 @@ export type Database = {
       }
       quiz_questions: {
         Row: {
+          advice: string | null
           correct_index: number
           created_at: string
           id: string
@@ -217,6 +218,7 @@ export type Database = {
           sort_order: number
         }
         Insert: {
+          advice?: string | null
           correct_index?: number
           created_at?: string
           id?: string
@@ -227,6 +229,7 @@ export type Database = {
           sort_order?: number
         }
         Update: {
+          advice?: string | null
           correct_index?: number
           created_at?: string
           id?: string
@@ -327,6 +330,15 @@ export type Database = {
           full_name: string
           id: string
           requested_grade: number
+        }[]
+      }
+      quiz_advice: {
+        Args: { _quiz_id: string }
+        Returns: {
+          advice: string
+          id: string
+          prompt: string
+          sort_order: number
         }[]
       }
       submit_quiz: {
