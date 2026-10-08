@@ -150,13 +150,13 @@ function Home() {
             علوم دینیہ کے اگلے سیشن کی باقی مدت:
           </p>
           <div className="mt-6">
-            <CountdownTimer targetDate={new Date("2026-09-06T03:00:00.000Z")} />
+            <CountdownTimer targetDate={new Date("2026-11-01T03:00:00.000Z")} />
           </div>
           <p className="mt-5 text-sm text-primary-foreground/80 font-medium">
-            Sunday, 6 September 2026 at 8:00 AM Karachi time.
+            Sunday, 1 November 2026 at 8:00 AM Karachi time.
           </p>
           <p className="urdu mt-1 text-sm text-gold">
-            اتوار، ۶ ستمبر ۲۰۲۶، صبح ۸:۰۰ بجے، کراچی کے وقت کے مطابق۔
+            اتوار، یکم نومبر ۲۰۲۶، صبح ۸:۰۰ بجے، کراچی کے وقت کے مطابق۔
           </p>
 
           <div className="mt-8 rounded-xl border border-gold/30 bg-primary-foreground/5 p-5 shadow-sm">

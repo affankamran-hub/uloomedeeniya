@@ -27,7 +27,7 @@ Facts:
   2. Grade 1 Tajweed ul Qur'an — Darussalam Qurani Qaida by Qari Muhammad Idris al-Asim (PDF)
   3. Grade 1 Usool e Hadith Manual (PDF)
 - Venue & Address: Rafa e Aam Society, Malir Halt, Karachi (near Masjid e Tauheed). Google Maps: https://maps.app.goo.gl/MZoq5aQCAjxgFHwP6
-- Next Class Session: Sunday, 6 September 2026 at 8:00 AM PKT. Weekly reinforcement: Saturday after Zuhr at Masjid e Tauheed.
+- Next Class Session: Sunday, 1 November 2026 at 8:00 AM PKT. Weekly reinforcement: Saturday after Zuhr at Masjid e Tauheed.
 - Examination Results: Official Grade 1 Midterm results are published on the website at /results with full marksheet PDF.
 - Competition: Whoever remains at the top of the leaderboard will win a surprise treat from the owner of the website!
 - Official websites: www.emanekhalis.com and www.therealislam.com.`;
@@ -89,9 +89,9 @@ function generateKnowledgeResponse(question: string): string {
     q.includes("درس")
   ) {
     if (isUrdu) {
-      return `⏰ **کلاس کے اوقات اور مقامِ درس:**\n\n- **اگلی باقاعدہ کلاس:** اتوار، ۶ ستمبر ۲۰۲۶، صبح ۸:۰۰ بجے\n- **ہفتہ وار تقویتی کلاس:** ہر ہفتہ، نمازِ ظہر کے بعد\n- **مقام:** مسجدِ توحید، رفاہِ عام سوسائٹی، ملیر ہالٹ، کراچی\n- **گوگل میپس پر لوکیشن:** [Google Maps Directions](https://maps.app.goo.gl/MZoq5aQCAjxgFHwP6)\n\nادارے میں تمام تعلیم فی سبیل اللہ دی جاتی ہے اور کوئی فیس نہیں ہے۔`;
+      return `⏰ **کلاس کے اوقات اور مقامِ درس:**\n\n- **اگلی باقاعدہ کلاس:** اتوار، یکم نومبر ۲۰۲۶، صبح ۸:۰۰ بجے\n- **ہفتہ وار تقویتی کلاس:** ہر ہفتہ، نمازِ ظہر کے بعد\n- **مقام:** مسجدِ توحید، رفاہِ عام سوسائٹی، ملیر ہالٹ، کراچی\n- **گوگل میپس پر لوکیشن:** [Google Maps Directions](https://maps.app.goo.gl/MZoq5aQCAjxgFHwP6)\n\nادارے میں تمام تعلیم فی سبیل اللہ دی جاتی ہے اور کوئی فیس نہیں ہے۔`;
     }
-    return `⏰ **Class Timings & Venue Location:**\n\n- **Next Session:** Sunday, 6 September 2026 at 8:00 AM PKT\n- **Weekly Reinforcement Class:** Every Saturday after Zuhr prayer\n- **Location:** Near Masjid e Tauheed, Rafa e Aam Society, Malir Halt, Karachi\n- **Google Maps Location:** [Open in Google Maps](https://maps.app.goo.gl/MZoq5aQCAjxgFHwP6)\n\nAll courses and materials are provided completely free in the way of Allah.`;
+    return `⏰ **Class Timings & Venue Location:**\n\n- **Next Session:** Sunday, 1 November 2026 at 8:00 AM PKT\n- **Weekly Reinforcement Class:** Every Saturday after Zuhr prayer\n- **Location:** Near Masjid e Tauheed, Rafa e Aam Society, Malir Halt, Karachi\n- **Google Maps Location:** [Open in Google Maps](https://maps.app.goo.gl/MZoq5aQCAjxgFHwP6)\n\nAll courses and materials are provided completely free in the way of Allah.`;
   }
 
   // 4. Books & Curriculum & PDFs

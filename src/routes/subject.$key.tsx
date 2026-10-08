@@ -157,7 +157,7 @@ function SubjectPage() {
                   <Card className="card-soft border-gold/50 bg-gold/5 shadow-md">
                     <CardHeader className="pb-3">
                       <div className="flex items-center justify-between flex-wrap gap-2">
-                        <Badge variant="gold" className="font-semibold">
+                        <Badge variant="secondary" className="font-semibold bg-gold text-primary">
                           Official Curriculum / بنیادی درسی قاعدہ
                         </Badge>
                         <span className="text-xs text-muted-foreground font-medium">Grade 1 • تجوید القرآن</span>
