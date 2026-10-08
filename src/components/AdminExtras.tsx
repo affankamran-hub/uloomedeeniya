@@ -1,3 +1,4 @@
+import { McqFields, emptyMcq, mcqFromRow, mcqPayload, validateMcq, type McqDraft } from "@/components/McqFields";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -111,6 +112,7 @@ type AdminQuestion = {
   prompt_ur: string | null;
   options: unknown;
   correct_index: number;
+  advice: string | null;
   sort_order: number;
 };
 
@@ -131,31 +133,19 @@ function QuestionManager({ quizId }: { quizId: string }) {
     },
   });
   const [editing, setEditing] = useState<string | null>(null);
-  const [draft, setDraft] = useState({ prompt: "", prompt_ur: "", options: "", correct: "1" });
+  const [draft, setDraft] = useState<McqDraft>(emptyMcq());
 
   const startEdit = (q: AdminQuestion) => {
     setEditing(q.id);
-    setDraft({
-      prompt: q.prompt,
-      prompt_ur: q.prompt_ur ?? "",
-      options: (Array.isArray(q.options) ? (q.options as string[]) : []).join("\n"),
-      correct: String(q.correct_index + 1),
-    });
+    setDraft(mcqFromRow(q));
   };
 
   const save = async (id: string) => {
-    const options = draft.options.split("\n").map((o) => o.trim()).filter(Boolean);
-    if (options.length < 2) { toast.error("Add at least two options, one per line"); return; }
-    const correctIndex = Number(draft.correct) - 1;
-    if (correctIndex < 0 || correctIndex >= options.length) { toast.error("Correct option number is out of range"); return; }
+    const err = validateMcq(draft);
+    if (err) { toast.error(err); return; }
     const { error } = await supabase
       .from("quiz_questions")
-      .update({
-        prompt: draft.prompt,
-        prompt_ur: draft.prompt_ur || null,
-        options,
-        correct_index: correctIndex,
-      })
+      .update(mcqPayload(draft))
       .eq("id", id);
     if (error) { toast.error(error.message); return; }
     toast.success("Question updated");
@@ -181,22 +171,7 @@ function QuestionManager({ quizId }: { quizId: string }) {
         if (editing === q.id) {
           return (
             <div key={q.id} className="space-y-3 rounded-lg border border-border p-4">
-              <div className="space-y-2">
-                <Label>Question (English)</Label>
-                <Input value={draft.prompt} onChange={(e) => setDraft({ ...draft, prompt: e.target.value })} />
-              </div>
-              <div className="space-y-2">
-                <Label>Question (اردو)</Label>
-                <Input className="urdu" value={draft.prompt_ur} onChange={(e) => setDraft({ ...draft, prompt_ur: e.target.value })} />
-              </div>
-              <div className="space-y-2">
-                <Label>Options — one per line</Label>
-                <Textarea rows={4} value={draft.options} onChange={(e) => setDraft({ ...draft, options: e.target.value })} />
-              </div>
-              <div className="space-y-2">
-                <Label>Correct option number</Label>
-                <Input type="number" min={1} value={draft.correct} onChange={(e) => setDraft({ ...draft, correct: e.target.value })} />
-              </div>
+              <McqFields value={draft} onChange={setDraft} />
               <div className="flex gap-2">
                 <Button size="sm" onClick={() => save(q.id)}>Save</Button>
                 <Button size="sm" variant="outline" onClick={() => setEditing(null)}>Cancel</Button>
@@ -218,6 +193,7 @@ function QuestionManager({ quizId }: { quizId: string }) {
                     </li>
                   ))}
                 </ul>
+                {q.advice && <p className="mt-2 text-sm italic">Supervisor's advice: {q.advice}</p>}
               </div>
               <div className="flex gap-2">
                 <Button size="sm" variant="outline" onClick={() => startEdit(q)}>Edit</Button>
@@ -245,12 +221,7 @@ export function QuizzesTab() {
     subject: "tafheem",
   });
   const [activeId, setActiveId] = useState<string | null>(null);
-  const [question, setQuestion] = useState({
-    prompt: "",
-    prompt_ur: "",
-    options: "",
-    correct: "1",
-  });
+  const [question, setQuestion] = useState<McqDraft>(emptyMcq());
 
   const createQuiz = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -276,20 +247,12 @@ export function QuizzesTab() {
   const addQuestion = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!activeId) return;
-    const options = question.options.split("\n").map((o) => o.trim()).filter(Boolean);
-    if (options.length < 2) { toast.error("Add at least two options, one per line"); return; }
-    const correctIndex = Number(question.correct) - 1;
-    if (correctIndex < 0 || correctIndex >= options.length) { toast.error("Correct option number is out of range"); return; }
-    const { error } = await supabase.from("quiz_questions").insert({
-      quiz_id: activeId,
-      prompt: question.prompt,
-      prompt_ur: question.prompt_ur || null,
-      options,
-      correct_index: correctIndex,
-    });
+    const err = validateMcq(question);
+    if (err) { toast.error(err); return; }
+    const { error } = await supabase.from("quiz_questions").insert({ quiz_id: activeId, ...mcqPayload(question) });
     if (error) { toast.error(error.message); return; }
     toast.success("Question added");
-    setQuestion({ prompt: "", prompt_ur: "", options: "", correct: "1" });
+    setQuestion(emptyMcq());
     qc.invalidateQueries({ queryKey: ["admin-questions", activeId] });
   };
 
@@ -369,22 +332,7 @@ export function QuizzesTab() {
             <CardHeader><CardTitle>Add an MCQ</CardTitle></CardHeader>
             <CardContent>
               <form onSubmit={addQuestion} className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Question (English)</Label>
-                  <Input required value={question.prompt} onChange={(e) => setQuestion({ ...question, prompt: e.target.value })} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Question (اردو)</Label>
-                  <Input className="urdu" value={question.prompt_ur} onChange={(e) => setQuestion({ ...question, prompt_ur: e.target.value })} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Options — one per line</Label>
-                  <Textarea required rows={4} value={question.options} onChange={(e) => setQuestion({ ...question, options: e.target.value })} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Correct option number</Label>
-                  <Input type="number" min={1} value={question.correct} onChange={(e) => setQuestion({ ...question, correct: e.target.value })} />
-                </div>
+                <McqFields value={question} onChange={setQuestion} />
                 <Button type="submit" className="w-full">Add question</Button>
               </form>
             </CardContent>
