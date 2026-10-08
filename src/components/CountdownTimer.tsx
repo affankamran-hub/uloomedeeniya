@@ -64,7 +64,7 @@ export function CountdownTimer({ targetDate }: { targetDate: Date }) {
         <span className="inline-flex items-center gap-1.5 font-medium">
           <Clock className="size-3.5 text-gold animate-spin-slow" /> Live Countdown / الٹی گنتی
         </span>
-        <span className="urdu text-gold">برائے اتوار، ۶ ستمبر ۲۰۲۶، صبح ۸:۰۰ بجے</span>
+        <span className="urdu text-gold">برائے اتوار، یکم نومبر ۲۰۲۶، صبح ۸:۰۰ بجے</span>
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
