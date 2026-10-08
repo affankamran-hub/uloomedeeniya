@@ -154,6 +154,14 @@ export function QuizList({
   const qc = useQueryClient();
 
   const allowed = isAdmin || isTeacher || !!profile?.approved;
+  const { data: doneIds } = useQuery({
+    queryKey: ["my-attempts", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data } = await supabase.from("quiz_attempts").select("quiz_id").eq("user_id", user!.id);
+      return new Set((data ?? []).map((r) => r.quiz_id));
+    },
+  });
 
   if (activeQuiz) {
     return (
@@ -168,6 +176,7 @@ export function QuizList({
             onDone={() => {
               setActiveQuiz(null);
               qc.invalidateQueries({ queryKey: ["leaderboard"] });
+              qc.invalidateQueries({ queryKey: ["my-attempts"] });
             }}
           />
         </CardContent>
@@ -229,7 +238,11 @@ export function QuizList({
             </CardHeader>
             <CardContent className="space-y-3 text-sm text-muted-foreground">
               {quiz.description && <p>{quiz.description}</p>}
-              {allowed ? (
+              {allowed && doneIds?.has(quiz.id) ? (
+                <p className="font-medium text-primary">
+                  Already submitted. / آپ یہ کوئز جمع کر چکے ہیں۔
+                </p>
+              ) : allowed ? (
                 <Button onClick={() => setActiveQuiz(quiz)}>Start</Button>
               ) : (
                 <p>
