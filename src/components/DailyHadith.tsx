@@ -44,7 +44,7 @@ const HADITH_COLLECTION: HadithItem[] = [
 export function DailyHadith() {
   const [index, setIndex] = useState(0);
   const [copied, setCopied] = useState(false);
-  const item = HADITH_COLLECTION[index];
+  const item = HADITH_COLLECTION[index] ?? HADITH_COLLECTION[0]!;
 
   const copyText = () => {
     const text = `Hadith of the Day (${item.source}):\n\n"${item.arabic}"\n\nاردو: ${item.urdu}\n\nEnglish: ${item.english}\n\n— Ma'had al-Uloom (Tauheed Trust, Karachi)`;

@@ -47,7 +47,7 @@ function ResourcesPage() {
             <div>
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between flex-wrap gap-2">
-                  <Badge variant="gold" className="font-semibold">Grade 1 • تجوید القرآن</Badge>
+                  <Badge variant="secondary" className="font-semibold bg-gold text-primary">Grade 1 • تجوید القرآن</Badge>
                   <span className="text-xs text-muted-foreground font-mono">PDF (5.7 MB)</span>
                 </div>
                 <CardTitle className="text-lg font-bold mt-2">Darussalam Qurani Qaida</CardTitle>
