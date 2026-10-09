@@ -15,7 +15,7 @@ export const Route = createFileRoute("/assignments")({
   }),
   component: () => (
     <SiteLayout>
-      <CategoryPage category="assignment" titleEn="Assignments" titleUr="مشقیں" intro="Weekly and monthly assignments given to students of each grade." />
+      <CategoryPage category="assignment" titleEn="Assignments" titleUr="مشقیں" intro="Weekly and monthly assignments given to students of each grade." allowUpload />
     </SiteLayout>
   ),
 });
