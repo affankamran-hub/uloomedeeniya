@@ -45,6 +45,29 @@ export function useQuizzes(kind?: string) {
   });
 }
 
+function AdviceList({ quizId }: { quizId: string }) {
+  const { data } = useQuery({
+    queryKey: ["quiz-advice", quizId],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("quiz_advice", { _quiz_id: quizId });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+  if (!data || data.length === 0) return null;
+  return (
+    <div className="space-y-2 rounded-lg border border-border bg-muted/30 p-4">
+      <p className="font-semibold">Supervisor's advice / نگران کا مشورہ</p>
+      {data.map((a) => (
+        <div key={a.id} className="text-sm">
+          <p className="font-medium">{a.prompt}</p>
+          <p className="text-muted-foreground">{a.advice}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function QuizRunner({ quiz, onDone }: { quiz: QuizRow; onDone: () => void }) {
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [result, setResult] = useState<{ score: number; total: number } | null>(null);
@@ -89,6 +112,7 @@ function QuizRunner({ quiz, onDone }: { quiz: QuizRow; onDone: () => void }) {
           Score: <span className="font-semibold text-primary">{result.score}</span> / {result.total}
         </p>
         <p className="urdu text-sm text-muted-foreground">آپ کا نتیجہ محفوظ کر لیا گیا ہے۔</p>
+        <AdviceList quizId={quiz.id} />
         <div className="flex gap-2">
           <Button asChild variant="outline">
             <Link to="/leaderboard">See leaderboard</Link>
