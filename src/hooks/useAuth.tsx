@@ -28,7 +28,7 @@ export function useAuth() {
       authRevision += 1;
       if (!active) return;
       setSession(s);
-      setUser(s?.user ?? null);
+      setUser((prev) => (prev?.id === s?.user?.id ? prev : (s?.user ?? null)));
       if (!s?.user) {
         setProfile(null);
         setIsAdmin(false);
@@ -40,7 +40,7 @@ export function useAuth() {
     supabase.auth.getSession().then(({ data }) => {
       if (!active || initialRevision !== authRevision) return;
       setSession(data.session);
-      setUser(data.session?.user ?? null);
+      setUser((prev) => (prev?.id === data.session?.user?.id ? prev : (data.session?.user ?? null)));
       setAuthLoading(false);
     });
     return () => {
@@ -75,7 +75,7 @@ export function useAuth() {
     return () => {
       active = false;
     };
-  }, [user]);
+  }, [user?.id]);
 
   return {
     session,
