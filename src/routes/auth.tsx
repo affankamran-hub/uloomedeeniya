@@ -84,40 +84,17 @@ function AuthPage() {
     setBusy(true);
     setGoogleErrorDetails(null);
     try {
-      // Always redirect back to /auth on the production domain after Google login
-      const redirectUri =
-        typeof window !== "undefined"
-          ? `${window.location.origin}/auth`
-          : "https://uloomedeeniya.vercel.app/auth";
-
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: redirectUri,
-          queryParams: { prompt: "select_account" },
-        },
+      const { lovable } = await import("@/integrations/lovable");
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: `${window.location.origin}/auth`,
       });
-
-      if (error) {
-        console.warn("Supabase Google OAuth error:", error);
-        if (
-          error.message?.toLowerCase().includes("missing oauth secret") ||
-          error.message?.toLowerCase().includes("unsupported provider") ||
-          error.message?.toLowerCase().includes("not enabled") ||
-          error.message?.toLowerCase().includes("provider is not enabled")
-        ) {
-          setGoogleErrorDetails("setup-needed");
-          toast.error("Google Sign-In is not yet configured. Use Email & Password below.");
-        } else {
-          toast.error(error.message || "Google sign-in failed. Please try again.");
-        }
+      if (result?.error) {
+        toast.error(result.error.message || "Google sign-in failed. Please try again.");
         setBusy(false);
         return;
       }
+      if (!result?.redirected) setBusy(false);
 
-      if (data?.url) {
-        window.location.assign(data.url);
-      }
     } catch (err) {
       console.error("Google auth error:", err);
       toast.error(
