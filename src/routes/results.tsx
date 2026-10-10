@@ -11,8 +11,11 @@ import {
   CheckCircle2,
   Users,
   Percent,
+  Pencil,
 } from "lucide-react";
 import { SiteLayout } from "@/components/SiteLayout";
+import { useAuth } from "@/hooks/useAuth";
+import { useSetting } from "@/lib/settings";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -104,9 +107,18 @@ function ResultsPage() {
   const [search, setSearch] = useState("");
   const [selectedGrade, setSelectedGrade] = useState("all");
   const [selectedArea, setSelectedArea] = useState("all");
+  const { isAdmin } = useAuth();
+  const { value: nameFixes, save: saveNames } = useSetting<Record<string, { name: string; fatherName: string }>>("result_names", {});
+  const [editRoll, setEditRoll] = useState<number | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editFather, setEditFather] = useState("");
+  const DATA = useMemo(
+    () => RESULTS_DATA.map((s) => ({ ...s, ...(nameFixes[String(s.rollNo)] ?? {}) })),
+    [nameFixes],
+  );
 
   const filteredResults = useMemo(() => {
-    return RESULTS_DATA.filter((s) => {
+    return DATA.filter((s) => {
       if (selectedGrade !== "all" && s.grade !== selectedGrade) return false;
       if (selectedArea !== "all" && s.area !== selectedArea) return false;
       if (!search.trim()) return true;
@@ -118,11 +130,11 @@ function ResultsPage() {
         s.area.includes(q)
       );
     });
-  }, [search, selectedGrade, selectedArea]);
+  }, [DATA, search, selectedGrade, selectedArea]);
 
   const topStudents = useMemo(() => {
-    return [...RESULTS_DATA].sort((a, b) => b.total - a.total).slice(0, 3);
-  }, []);
+    return [...DATA].sort((a, b) => b.total - a.total).slice(0, 3);
+  }, [DATA]);
 
   const getBadgeVariant = (grade: StudentResult["grade"]) => {
     switch (grade) {
@@ -284,12 +296,34 @@ function ResultsPage() {
                 {filteredResults.map((s) => (
                   <TableRow key={s.rollNo} className="text-center hover:bg-muted/40 transition-colors">
                     <TableCell className="font-mono font-bold text-xs">{s.rollNo}</TableCell>
-                    <TableCell className="text-right font-medium">
-                      <span className="urdu text-base">{s.name}</span>
-                    </TableCell>
-                    <TableCell className="text-right text-muted-foreground">
-                      <span className="urdu text-sm">{s.fatherName}</span>
-                    </TableCell>
+                    {editRoll === s.rollNo ? (
+                      <>
+                        <TableCell><Input dir="rtl" className="urdu h-8" value={editName} onChange={(e) => setEditName(e.target.value)} /></TableCell>
+                        <TableCell>
+                          <Input dir="rtl" className="urdu h-8" value={editFather} onChange={(e) => setEditFather(e.target.value)} />
+                          <div className="mt-1 flex gap-1">
+                            <Button size="sm" className="h-7 text-xs" onClick={async () => {
+                              if (await saveNames({ ...nameFixes, [String(s.rollNo)]: { name: editName.trim(), fatherName: editFather.trim() } })) setEditRoll(null);
+                            }}>Save</Button>
+                            <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => setEditRoll(null)}>Cancel</Button>
+                          </div>
+                        </TableCell>
+                      </>
+                    ) : (
+                      <>
+                        <TableCell className="text-right font-medium">
+                          <span className="urdu text-base">{s.name}</span>
+                          {isAdmin && (
+                            <button type="button" aria-label="Edit name" className="mr-2 text-primary" onClick={() => { setEditRoll(s.rollNo); setEditName(s.name); setEditFather(s.fatherName); }}>
+                              <Pencil className="inline size-3.5" />
+                            </button>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-right text-muted-foreground">
+                          <span className="urdu text-sm">{s.fatherName}</span>
+                        </TableCell>
+                      </>
+                    )}
                     <TableCell>
                       <Badge variant="outline" className="urdu text-xs">{s.area}</Badge>
                     </TableCell>
