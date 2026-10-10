@@ -21,14 +21,14 @@ const DEFAULT_TIMES: Times = {
   fajr: "04:55", sunrise: "06:12", dhuhr: "12:30", asr: "16:45", maghrib: "18:48", isha: "20:10",
 };
 
-function fmt(t: string) {
-  const [h, m] = t.split(":").map(Number);
+function fmt(t: string = "00:00") {
+  const [h = 0, m = 0] = t.split(":").map(Number);
   const ap = h >= 12 ? "PM" : "AM";
   const hh = h % 12 || 12;
   return `${String(hh).padStart(2, "0")}:${String(m).padStart(2, "0")} ${ap}`;
 }
-const mins = (t: string) => {
-  const [h, m] = t.split(":").map(Number);
+const mins = (t: string = "00:00") => {
+  const [h = 0, m = 0] = t.split(":").map(Number);
   return h * 60 + m;
 };
 
@@ -98,7 +98,7 @@ export function PrayerTimes() {
                   <Input
                     type="time"
                     className="mt-1 h-8 px-1 text-xs"
-                    value={draft[prayer.key]}
+                    value={draft[prayer.key] ?? ""}
                     onChange={(e) => setDraft({ ...draft, [prayer.key]: e.target.value })}
                   />
                 ) : (
