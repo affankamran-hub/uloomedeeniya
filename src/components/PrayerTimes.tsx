@@ -1,69 +1,54 @@
 import { useState, useEffect } from "react";
-import { Clock, MapPin, Moon, Sun, Sunrise, Sunset, Calendar } from "lucide-react";
+import { Clock, MapPin, Moon, Sun, Sunrise, Sunset, Calendar, Pencil } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useAuth } from "@/hooks/useAuth";
+import { useSetting } from "@/lib/settings";
 
-type Prayer = {
-  name: string;
-  nameUr: string;
-  time: string;
-  icon: typeof Sun;
-  isNext?: boolean;
+const BASE = [
+  { key: "fajr", name: "Fajr", nameUr: "فجر", icon: Moon },
+  { key: "sunrise", name: "Sunrise", nameUr: "طلوعِ آفتاب", icon: Sunrise },
+  { key: "dhuhr", name: "Dhuhr", nameUr: "ظہر", icon: Sun },
+  { key: "asr", name: "Asr", nameUr: "عصر", icon: Sun },
+  { key: "maghrib", name: "Maghrib", nameUr: "مغرب", icon: Sunset },
+  { key: "isha", name: "Isha", nameUr: "عشاء", icon: Moon },
+] as const;
+
+type Times = Record<string, string>; // 24h "HH:MM"
+const DEFAULT_TIMES: Times = {
+  fajr: "04:55", sunrise: "06:12", dhuhr: "12:30", asr: "16:45", maghrib: "18:48", isha: "20:10",
 };
 
-// Karachi standard approximate calculation / prayer schedule
-function getKarachiPrayerTimes(date: Date): Prayer[] {
-  // Approximate standard Karachi times for early September
-  const prayers: Prayer[] = [
-    { name: "Fajr", nameUr: "فجر", time: "04:55 AM", icon: Moon },
-    { name: "Sunrise", nameUr: "طلوعِ آفتاب", time: "06:12 AM", icon: Sunrise },
-    { name: "Dhuhr", nameUr: "ظہر", time: "12:30 PM", icon: Sun },
-    { name: "Asr", nameUr: "عصر", time: "04:45 PM", icon: Sun },
-    { name: "Maghrib", nameUr: "مغرب", time: "06:48 PM", icon: Sunset },
-    { name: "Isha", nameUr: "عشاء", time: "08:10 PM", icon: Moon },
-  ];
-
-  const now = date.getHours() * 60 + date.getMinutes();
-  const timesInMinutes = [
-    4 * 60 + 55,  // Fajr
-    6 * 60 + 12,  // Sunrise
-    12 * 60 + 30, // Dhuhr
-    16 * 60 + 45, // Asr
-    18 * 60 + 48, // Maghrib
-    20 * 60 + 10, // Isha
-  ];
-
-  let nextIndex = timesInMinutes.findIndex((t) => t > now);
-  if (nextIndex === -1) nextIndex = 0; // After Isha, next is Fajr
-
-  return prayers.map((p, i) => ({
-    ...p,
-    isNext: i === nextIndex,
-  }));
+function fmt(t: string) {
+  const [h, m] = t.split(":").map(Number);
+  const ap = h >= 12 ? "PM" : "AM";
+  const hh = h % 12 || 12;
+  return `${String(hh).padStart(2, "0")}:${String(m).padStart(2, "0")} ${ap}`;
 }
+const mins = (t: string) => {
+  const [h, m] = t.split(":").map(Number);
+  return h * 60 + m;
+};
 
 export function PrayerTimes() {
-  const [prayers, setPrayers] = useState<Prayer[]>([]);
-  const [currentTime, setCurrentTime] = useState<string>("");
+  const { isAdmin } = useAuth();
+  const { value: saved, save } = useSetting<Times>("prayer_times", DEFAULT_TIMES);
+  const times = { ...DEFAULT_TIMES, ...saved };
+  const [now, setNow] = useState<Date | null>(null);
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState<Times>(times);
 
   useEffect(() => {
-    const update = () => {
-      const now = new Date();
-      setPrayers(getKarachiPrayerTimes(now));
-      setCurrentTime(
-        now.toLocaleTimeString("en-US", {
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-          hour12: true,
-        })
-      );
-    };
-
-    update();
-    const timer = setInterval(update, 1000);
+    setNow(new Date());
+    const timer = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
+
+  const nowMin = now ? now.getHours() * 60 + now.getMinutes() : -1;
+  let nextIndex = BASE.findIndex((p) => mins(times[p.key]) > nowMin);
+  if (nextIndex === -1) nextIndex = 0;
 
   return (
     <Card className="card-soft border-gold/30 bg-card/90 shadow-md">
@@ -79,40 +64,59 @@ export function PrayerTimes() {
             <Badge variant="outline" className="text-xs gap-1 border-gold/40 text-gold">
               <MapPin className="size-3" /> Masjid e Tauheed, Rafa e Aam
             </Badge>
-            {currentTime && (
-              <span className="font-mono text-xs text-muted-foreground">{currentTime}</span>
+            {now && (
+              <span className="font-mono text-xs text-muted-foreground">
+                {now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true })}
+              </span>
+            )}
+            {isAdmin && !editing && (
+              <Button size="sm" variant="outline" onClick={() => { setDraft(times); setEditing(true); }}>
+                <Pencil className="size-3.5" /> Edit times
+              </Button>
             )}
           </div>
         </div>
       </CardHeader>
       <CardContent className="pt-4 space-y-4">
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2.5 text-center">
-          {prayers.map((prayer) => {
+          {BASE.map((prayer, i) => {
             const Icon = prayer.icon;
+            const isNext = !editing && now !== null && i === nextIndex;
             return (
               <div
-                key={prayer.name}
+                key={prayer.key}
                 className={`p-3 rounded-xl border transition-all ${
-                  prayer.isNext
-                    ? "border-gold bg-gold/15 shadow-sm ring-1 ring-gold/50"
-                    : "border-border bg-background/50 hover:border-border/80"
+                  isNext ? "border-gold bg-gold/15 shadow-sm ring-1 ring-gold/50" : "border-border bg-background/50"
                 }`}
               >
                 <div className="flex items-center justify-center gap-1 text-muted-foreground mb-1">
-                  <Icon className={`size-3.5 ${prayer.isNext ? "text-gold" : ""}`} />
+                  <Icon className={`size-3.5 ${isNext ? "text-gold" : ""}`} />
                   <span className="text-xs font-medium">{prayer.name}</span>
                 </div>
                 <p className="urdu text-sm font-semibold text-foreground">{prayer.nameUr}</p>
-                <p className="mt-1 font-mono text-xs font-bold text-foreground">{prayer.time}</p>
-                {prayer.isNext && (
-                  <Badge variant="default" className="mt-1.5 text-[9px] px-1.5 py-0 bg-gold text-slate-950">
-                    Next / اگلی
-                  </Badge>
+                {editing ? (
+                  <Input
+                    type="time"
+                    className="mt-1 h-8 px-1 text-xs"
+                    value={draft[prayer.key]}
+                    onChange={(e) => setDraft({ ...draft, [prayer.key]: e.target.value })}
+                  />
+                ) : (
+                  <p className="mt-1 font-mono text-xs font-bold text-foreground">{fmt(times[prayer.key])}</p>
+                )}
+                {isNext && (
+                  <Badge variant="default" className="mt-1.5 text-[9px] px-1.5 py-0">Next / اگلی</Badge>
                 )}
               </div>
             );
           })}
         </div>
+        {editing && (
+          <div className="flex gap-2">
+            <Button size="sm" onClick={async () => { if (await save(draft)) setEditing(false); }}>Save times</Button>
+            <Button size="sm" variant="outline" onClick={() => setEditing(false)}>Cancel</Button>
+          </div>
+        )}
 
         <div className="rounded-lg border border-border/70 bg-muted/40 p-3 text-xs text-muted-foreground flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-1.5">
